@@ -834,6 +834,11 @@ app.post('/api/personaje/load', (req, res) => {
             resistencia: personaje.resistencia,
             agilidad: personaje.agilidad,
             inteligencia: personaje.inteligencia
+        },
+        cooldowns: {
+            scavenge: 0,
+            craft: 0,
+            shoot: 0
         }
     };
 
