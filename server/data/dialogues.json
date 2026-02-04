@@ -1,0 +1,588 @@
+[
+  {
+    "id": "dialogo_ana_inicial",
+    "npc_id": "npc_ana",
+    "texto": "Sos nuevo aquí. Espero que puedas ayudar, no solo consumir recursos.",
+    "condiciones": {
+      "flags_required": [],
+      "flags_forbidden": ["ana_met"]
+    },
+    "opciones": [
+      {
+        "texto": "✅ [Ayudar] ¿Qué necesitas?",
+        "consecuencias": {
+          "set_flags": ["ana_met"],
+          "modificar_relacion": { "npc_ana": 5 }
+        },
+        "siguiente": "dialogo_ana_pide_medicina"
+      },
+      {
+        "texto": "❌ [Rechazar] No voy a hacer tu trabajo sucio",
+        "consecuencias": {
+          "set_flags": ["ana_met", "player_hostile_ana"],
+          "modificar_relacion": { "npc_ana": -10 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_ana_pide_medicina",
+    "npc_id": "npc_ana",
+    "texto": "Teresa está enferma. Necesito antibióticos, pero el Dr. Gómez me los niega. Dice que 'no hay suficientes'.",
+    "condiciones": {
+      "flags_required": ["ana_met"],
+      "flags_forbidden": ["ana_requested_meds", "quest_103_completed"]
+    },
+    "opciones": [
+      {
+        "texto": "✅ [Aceptar] Voy a conseguirlos",
+        "consecuencias": {
+          "set_flags": ["ana_requested_meds"],
+          "start_quest": "quest_medicina_teresa",
+          "modificar_relacion": { "npc_ana": 10 }
+        },
+        "siguiente": "dialogo_ana_esperando"
+      },
+      {
+        "texto": "🤔 [Cuestionar] ¿Por qué no se los exiges?",
+        "consecuencias": {
+          "set_flags": ["ana_requested_meds", "player_questions_leadership"],
+          "start_quest": "quest_medicina_teresa",
+          "modificar_relacion": { "npc_ana": -5 }
+        },
+        "siguiente": "dialogo_ana_esperando"
+      }
+    ]
+  },
+  {
+    "id": "dialogo_ana_esperando",
+    "npc_id": "npc_ana",
+    "texto": "Por favor, date prisa. Teresa no tiene mucho tiempo.",
+    "condiciones": {
+      "flags_required": ["ana_requested_meds"],
+      "flags_forbidden": ["quest_103_completed", "got_medicine_from_gomez"]
+    },
+    "opciones": [
+      {
+        "texto": "🏃 [Apurar] Voy a buscarla ahora",
+        "consecuencias": {},
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_ana_entrega_medicina",
+    "npc_id": "npc_ana",
+    "texto": "¿Conseguiste los antibióticos?",
+    "condiciones": {
+      "flags_required": ["ana_requested_meds"],
+      "flags_forbidden": ["quest_103_completed"],
+      "has_item": "item_antibioticos"
+    },
+    "opciones": [
+      {
+        "texto": "✅ [Entregar] Aquí están los antibióticos",
+        "consecuencias": {
+          "remove_item": { "id": "item_antibioticos", "cantidad": 1 },
+          "set_flags": ["quest_103_completed", "ana_owes_player"],
+          "complete_quest": "quest_medicina_teresa",
+          "give_xp": 50,
+          "modificar_relacion": { "npc_ana": 20 }
+        },
+        "siguiente": "dialogo_ana_agradecimiento"
+      },
+      {
+        "texto": "🤥 [Mentir] Gómez se niega a darlos",
+        "consecuencias": {
+          "set_flags": ["player_lied_about_meds"],
+          "modificar_relacion": { "npc_ana": -15, "npc_gomez": 10 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_ana_agradecimiento",
+    "npc_id": "npc_ana",
+    "texto": "Gracias. Teresa va a vivir gracias a vos. No lo voy a olvidar.",
+    "condiciones": {
+      "flags_required": ["quest_103_completed"]
+    },
+    "opciones": [
+      {
+        "texto": "De nada",
+        "consecuencias": {},
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_gomez_inicial",
+    "npc_id": "npc_dr_gomez",
+    "texto": "¿Herido? Espero que no. No tengo recursos para desperdiciar.",
+    "condiciones": {
+      "flags_required": [],
+      "flags_forbidden": ["gomez_met"]
+    },
+    "opciones": [
+      {
+        "texto": "⚠️ [Acusar] Ana dice que escondés medicina",
+        "consecuencias": {
+          "set_flags": ["gomez_met", "player_accused_gomez"],
+          "modificar_relacion": { "npc_gomez": -20 }
+        },
+        "siguiente": "dialogo_gomez_ofendido"
+      },
+      {
+        "texto": "👋 [Amigable] Solo vine a presentarme",
+        "consecuencias": {
+          "set_flags": ["gomez_met"],
+          "modificar_relacion": { "npc_gomez": 5 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_gomez_ofendido",
+    "npc_id": "npc_dr_gomez",
+    "texto": "¿Ana te mandó a acusarme? Típico de ella. Yo manejo los recursos como se debe.",
+    "condiciones": {
+      "flags_required": ["player_accused_gomez"]
+    },
+    "opciones": [
+      {
+        "texto": "✅ [Pedir] Solo necesito antibióticos",
+        "consecuencias": {},
+        "siguiente": "dialogo_gomez_pedir_medicina"
+      },
+      {
+        "texto": "❌ [Rechazar] Dejá, ya veo cómo sos",
+        "consecuencias": {
+          "modificar_relacion": { "npc_gomez": -5 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_gomez_pedir_medicina",
+    "npc_id": "npc_dr_gomez",
+    "texto": "¿Ana te mandó? Claro. Siempre quiere MÁS. No entiende que hay que racionar.",
+    "condiciones": {
+      "flags_required": ["ana_requested_meds"],
+      "flags_forbidden": ["got_medicine_from_gomez"]
+    },
+    "opciones": [
+      {
+        "texto": "🙏 [Apelar] Es para Teresa. Se está muriendo",
+        "consecuencias": {
+          "set_flags": ["player_appealed_morality"],
+          "modificar_relacion": { "npc_gomez": -5 }
+        },
+        "siguiente": "dialogo_gomez_exige_favor"
+      },
+      {
+        "texto": "💥 [Intimidar] Dame la medicina o se lo digo a todos",
+        "stat_check": { "fuerza": 5 },
+        "consecuencias": {
+          "set_flags": ["player_threatened_gomez", "got_medicine_from_gomez"],
+          "give_item": { "id": "item_antibioticos", "cantidad": 1 },
+          "modificar_relacion": { "npc_gomez": -30 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "🤝 [Persuadir] Te devolveré el favor después",
+        "stat_check": { "carisma": 5 },
+        "consecuencias": {
+          "set_flags": ["player_negotiated_gomez", "got_medicine_from_gomez", "owes_gomez_favor"],
+          "give_item": { "id": "item_antibioticos", "cantidad": 1 },
+          "modificar_relacion": { "npc_gomez": 10 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_gomez_exige_favor",
+    "npc_id": "npc_dr_gomez",
+    "texto": "Está bien. Pero vas a tener que hacer algo por mí primero.",
+    "condiciones": {
+      "flags_required": ["player_appealed_morality"],
+      "flags_forbidden": ["got_medicine_from_gomez"]
+    },
+    "opciones": [
+      {
+        "texto": "¿Qué necesitas?",
+        "consecuencias": {
+          "set_flags": ["agreed_gomez_task", "got_medicine_from_gomez"],
+          "give_item": { "id": "item_antibioticos", "cantidad": 1 },
+          "start_quest": "quest_gomez_favor"
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "Olvidalo. Lo consigo de otra forma",
+        "consecuencias": {
+          "set_flags": ["refused_gomez_task"],
+          "modificar_relacion": { "npc_gomez": -10 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_marco_guardia",
+    "npc_id": "npc_marco",
+    "texto": "Todo tranquilo. Ana dice que sos de fiar.",
+    "condiciones": {
+      "flags_required": ["ana_met"],
+      "relacion_minima": { "npc_ana": 10 }
+    },
+    "opciones": [
+      {
+        "texto": "¿Qué opinas del Dr. Gómez?",
+        "consecuencias": {
+          "set_flags": ["marco_talked_about_gomez"]
+        },
+        "siguiente": "dialogo_marco_opinion_gomez"
+      },
+      {
+        "texto": "Nos vemos",
+        "consecuencias": {},
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_marco_opinion_gomez",
+    "npc_id": "npc_marco",
+    "texto": "Ese tipo esconde algo. No confío en médicos que 'racionan' selectivamente.",
+    "condiciones": {
+      "flags_required": ["marco_talked_about_gomez"]
+    },
+    "opciones": [
+      {
+        "texto": "¿Crees que tiene medicina oculta?",
+        "consecuencias": {
+          "set_flags": ["marco_suspects_gomez"],
+          "modificar_relacion": { "npc_marco": 5 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "Mejor no meternos",
+        "consecuencias": {},
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_nina_generador",
+    "npc_id": "npc_nina",
+    "texto": "El generador está al límite. Necesito piezas, pero Ana prefiere 'comida y medicina'.",
+    "condiciones": {
+      "flags_required": [],
+      "flags_forbidden": []
+    },
+    "opciones": [
+      {
+        "texto": "¿Qué necesitas exactamente?",
+        "consecuencias": {
+          "set_flags": ["nina_explained_generator"]
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "Sin electricidad, todos mueren",
+        "consecuencias": {
+          "set_flags": ["player_agrees_nina"],
+          "modificar_relacion": { "npc_nina": 10 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_sofia_pista",
+    "npc_id": "npc_sofia",
+    "texto": "...",
+    "condiciones": {
+      "flags_required": ["ana_requested_meds"],
+      "relacion_minima": { "npc_sofia": 15 }
+    },
+    "opciones": [
+      {
+        "texto": "¿Viste algo raro con el Dr. Gómez?",
+        "consecuencias": {
+          "set_flags": ["sofia_hints_gomez_stash"],
+          "modificar_relacion": { "npc_sofia": -5 }
+        },
+        "siguiente": "dialogo_sofia_susurra"
+      },
+      {
+        "texto": "Dejá, no importa",
+        "consecuencias": {},
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "dialogo_sofia_susurra",
+    "npc_id": "npc_sofia",
+    "texto": "*Susurra* Revisa la enfermería de noche. Hay una puerta que no está en el plano.",
+    "condiciones": {
+      "flags_required": ["sofia_hints_gomez_stash"]
+    },
+    "opciones": [
+      {
+        "texto": "Gracias",
+        "consecuencias": {
+          "set_flags": ["knows_gomez_secret_door"]
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_consulta_ana",
+    "npc_id": "npc_ana",
+    "texto": "Tengo que anunciar racionamiento. La gente va a reaccionar mal. Gómez seguro se opone... ¿vos qué harías?",
+    "condiciones": {
+      "flags_required": [],
+      "flags_forbidden": ["evento_racionamiento_iniciado"],
+      "relacion_minima": { "npc_ana": 10 }
+    },
+    "opciones": [
+      {
+        "texto": "✅ [Apoyar] Es lo correcto, te respaldo",
+        "consecuencias": {
+          "set_flags": ["player_prometio_apoyo"],
+          "modificar_relacion": { "npc_ana": 10 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "🤔 [Dudar] ¿Estás segura? Puede haber otra forma",
+        "consecuencias": {
+          "set_flags": ["player_dudo_ana"],
+          "modificar_relacion": { "npc_ana": 0 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "⚠️ [Revelar] Gómez tiene medicina escondida",
+        "consecuencias": {
+          "set_flags": ["player_told_ana_secret", "ana_knows_gomez_stash"],
+          "modificar_relacion": { "npc_ana": 15 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "❌ [Rechazar] No te metas en esto, es tu problema",
+        "consecuencias": {
+          "set_flags": ["player_abandono_ana"],
+          "modificar_relacion": { "npc_ana": -10 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_decision",
+    "npc_id": "npc_ana",
+    "texto": "Todos te miran. El refugio espera tu palabra. ¿Qué posición tomás?",
+    "condiciones": {
+      "flags_required": ["evento_racionamiento_iniciado"],
+      "flags_forbidden": ["player_intervino_evento"]
+    },
+    "opciones": [
+      {
+        "texto": "🛡️ [Apoyar a Ana] Tiene razón. Es lo justo",
+        "consecuencias": {
+          "set_flags": ["player_intervino_evento", "player_apoyo_ana_publico"],
+          "modificar_relacion": { "npc_ana": 20, "npc_gomez": -15, "npc_marco": 10 }
+        },
+        "siguiente": "evento_racionamiento_ana_victoria"
+      },
+      {
+        "texto": "💊 [Apoyar a Gómez] Racionar medicina es inhumano",
+        "consecuencias": {
+          "set_flags": ["player_intervino_evento", "player_apoyo_gomez_publico"],
+          "modificar_relacion": { "npc_gomez": 20, "npc_ana": -15, "npc_marco": -10 }
+        },
+        "siguiente": "evento_racionamiento_gomez_victoria"
+      },
+      {
+        "texto": "🏃 [Apoyar a Nina] Nina tiene razón. Deberíamos irnos",
+        "consecuencias": {
+          "set_flags": ["player_intervino_evento", "player_propuso_huida"],
+          "modificar_relacion": { "npc_nina": 20, "npc_ana": -20 },
+          "start_quest": "quest_exodo"
+        },
+        "siguiente": "evento_racionamiento_nina_victoria"
+      },
+      {
+        "texto": "💣 [REVELAR ESCONDITE] Gómez tiene medicina oculta",
+        "condiciones": {
+          "flags_required": ["knows_gomez_secret_door"]
+        },
+        "consecuencias": {
+          "set_flags": ["player_intervino_evento", "player_revelo_secreto_gomez"],
+          "modificar_relacion": { "npc_gomez": -50, "npc_ana": 30 }
+        },
+        "siguiente": "evento_racionamiento_revelacion"
+      },
+      {
+        "texto": "🤐 [Quedarse callado] (No decir nada)",
+        "consecuencias": {
+          "set_flags": ["player_intervino_evento", "player_silencio_evento"],
+          "modificar_relacion": { "npc_ana": -5, "npc_gomez": 5, "npc_sofia": 5 }
+        },
+        "siguiente": "evento_racionamiento_silencio"
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_revelacion",
+    "npc_id": "npc_ana",
+    "texto": "Marco regresa con una caja llena de antibióticos, morfina y vendajes. 'Suficiente para UN MES. Mientras la gente moría.' ¿Qué hacemos con Gómez?",
+    "condiciones": {
+      "flags_required": ["player_revelo_secreto_gomez"]
+    },
+    "opciones": [
+      {
+        "texto": "⚖️ [Arrestar] Que lo juzgue el refugio",
+        "consecuencias": {
+          "set_flags": ["gomez_arrestado", "evento_racionamiento_resuelto"],
+          "start_quest": "quest_juicio_gomez"
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "🚪 [Expulsar] Echarlo del refugio",
+        "consecuencias": {
+          "set_flags": ["gomez_expulsado", "evento_racionamiento_resuelto"],
+          "modificar_relacion": { "npc_gomez": -30 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "💀 [Ejecutar] Marco, haz lo que tengas que hacer",
+        "consecuencias": {
+          "set_flags": ["gomez_ejecutado", "marco_ejecuto_gomez", "evento_racionamiento_resuelto"],
+          "modificar_relacion": { "npc_marco": 15 }
+        },
+        "siguiente": "evento_racionamiento_ejecucion"
+      },
+      {
+        "texto": "🤝 [Perdonar] Que devuelva la medicina y listo",
+        "consecuencias": {
+          "set_flags": ["gomez_perdonado", "evento_racionamiento_resuelto"],
+          "modificar_relacion": { "npc_gomez": -10, "npc_ana": -10, "npc_marco": -15 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_ana_victoria",
+    "npc_id": "npc_ana",
+    "texto": "Gracias por el apoyo. Juntos vamos a sacar esto adelante. El racionamiento empieza mañana.",
+    "condiciones": {
+      "flags_required": ["player_apoyo_ana_publico"]
+    },
+    "opciones": [
+      {
+        "texto": "Cuenta conmigo",
+        "consecuencias": {
+          "set_flags": ["ana_autoridad_reforzada", "evento_racionamiento_resuelto"],
+          "start_quest": "quest_nuevo_orden"
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_gomez_victoria",
+    "npc_id": "npc_dr_gomez",
+    "texto": "Sabía que entenderías. Ana está tomando decisiones irracionales. Necesitamos actuar antes de que sea tarde.",
+    "condiciones": {
+      "flags_required": ["player_apoyo_gomez_publico"]
+    },
+    "opciones": [
+      {
+        "texto": "¿Qué propones?",
+        "consecuencias": {
+          "set_flags": ["refugio_dividido", "evento_racionamiento_resuelto"],
+          "start_quest": "quest_revolucion_silenciosa"
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_nina_victoria",
+    "npc_id": "npc_nina",
+    "texto": "Sabía que eras inteligente. Prepará tus cosas. Nos vamos en 24 horas. Los que quieran sobrevivir, que vengan.",
+    "condiciones": {
+      "flags_required": ["player_propuso_huida"]
+    },
+    "opciones": [
+      {
+        "texto": "Voy a preparar todo",
+        "consecuencias": {
+          "set_flags": ["nina_abandono_refugio", "evento_racionamiento_resuelto"]
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_silencio",
+    "npc_id": "npc_sofia",
+    "texto": "*Te mira con interés* Interesante. No tomaste partido. Eso dice mucho más de lo que crees. Hablemos en privado.",
+    "condiciones": {
+      "flags_required": ["player_silencio_evento"]
+    },
+    "opciones": [
+      {
+        "texto": "¿De qué querés hablar?",
+        "consecuencias": {
+          "set_flags": ["sofia_recluta_jugador", "evento_racionamiento_resuelto"],
+          "start_quest": "quest_observador",
+          "modificar_relacion": { "npc_sofia": 20 }
+        },
+        "siguiente": null
+      }
+    ]
+  },
+  {
+    "id": "evento_racionamiento_ejecucion",
+    "npc_id": "npc_marco",
+    "texto": "*Disparo seco. El cuerpo de Gómez cae.* Orden cumplida. Que nadie más oculte recursos. El refugio es uno solo.",
+    "condiciones": {
+      "flags_required": ["gomez_ejecutado"]
+    },
+    "opciones": [
+      {
+        "texto": "Era necesario",
+        "consecuencias": {
+          "set_flags": ["refugio_autoritario"],
+          "modificar_relacion": { "npc_marco": 20, "npc_ana": -10 }
+        },
+        "siguiente": null
+      },
+      {
+        "texto": "Esto fue demasiado lejos...",
+        "consecuencias": {
+          "set_flags": ["player_arrepentido_ejecucion"],
+          "modificar_relacion": { "npc_marco": -10 }
+        },
+        "siguiente": null
+      }
+    ]
+  }
+]

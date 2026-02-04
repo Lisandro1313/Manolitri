@@ -1,0 +1,77 @@
+[
+  {
+    "id": "npc_ana",
+    "nombre": "Ana",
+    "rol": "líder",
+    "objetivo": "Mantener a todos con vida, sin importar el costo moral",
+    "limite_moral": "No abandonará a los débiles activamente (pero sí priorizará)",
+    "secreto": "Sabe que la medicina está racionada porque hay un acaparador interno",
+    "relacion_clave": "Depende del Dr. Gómez, pero no confía en él",
+    "ubicacion_inicial": "refugio_entrada",
+    "estado_inicial": {
+      "salud": 100,
+      "stress": 60,
+      "confianza_jugador": 0
+    }
+  },
+  {
+    "id": "npc_dr_gomez",
+    "nombre": "Dr. Gómez",
+    "rol": "médico",
+    "objetivo": "Acumular recursos médicos para 'emergencias futuras'",
+    "limite_moral": "No dejará morir a alguien frente a él, pero acapara preventivamente",
+    "secreto": "Tiene un escondite con el triple de medicina que admite",
+    "relacion_clave": "Rival silencioso de Ana - quiere controlar recursos",
+    "ubicacion_inicial": "refugio_enfermeria",
+    "estado_inicial": {
+      "salud": 100,
+      "stress": 40,
+      "confianza_jugador": 0
+    }
+  },
+  {
+    "id": "npc_marco",
+    "nombre": "Marco",
+    "rol": "guardia",
+    "objetivo": "Seguir órdenes de Ana ciegamente - necesita estructura",
+    "limite_moral": "No cuestionará a Ana, incluso si está equivocada",
+    "secreto": "Era militar antes del desastre - hizo algo que no menciona",
+    "relacion_clave": "Leal a Ana, desconfía del Dr. Gómez",
+    "ubicacion_inicial": "refugio_entrada",
+    "estado_inicial": {
+      "salud": 100,
+      "stress": 30,
+      "confianza_jugador": 0
+    }
+  },
+  {
+    "id": "npc_nina",
+    "nombre": "Nina",
+    "rol": "ingeniera",
+    "objetivo": "Reparar el generador para poder salir del refugio",
+    "limite_moral": "No desperdiciará recursos en gente 'sin futuro'",
+    "secreto": "Tiene un plan para irse sola si el refugio colapsa",
+    "relacion_clave": "Trabaja con Ana, pero planea traicionarla si es necesario",
+    "ubicacion_inicial": "refugio_generador",
+    "estado_inicial": {
+      "salud": 100,
+      "stress": 70,
+      "confianza_jugador": 0
+    }
+  },
+  {
+    "id": "npc_sofia",
+    "nombre": "Sofía",
+    "rol": "civil",
+    "objetivo": "Sobrevivir sin involucrarse - no tomar partido",
+    "limite_moral": "No traicionará activamente, pero tampoco ayudará",
+    "secreto": "Vio al Dr. Gómez esconder medicina, pero no dirá nada",
+    "relacion_clave": "Observa a todos, habla con nadie",
+    "ubicacion_inicial": "refugio_dormitorios",
+    "estado_inicial": {
+      "salud": 80,
+      "stress": 90,
+      "confianza_jugador": 0
+    }
+  }
+]

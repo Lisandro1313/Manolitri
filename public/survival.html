@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧟 Survival Zombie MVP</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a1a1a;
+      color: #00ff00;
+      padding: 20px;
+    }
+    
+    #game {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #ff0000;
+      text-shadow: 2px 2px #000;
+      margin-bottom: 20px;
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .panel {
+      background: #2a2a2a;
+      border: 2px solid #00ff00;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    
+    .panel h2 {
+      color: #ffff00;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 5px;
+    }
+    
+    .stat {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    
+    .stat-bar {
+      background: #000;
+      height: 15px;
+      border: 1px solid #00ff00;
+      margin-top: 3px;
+      position: relative;
+    }
+    
+    .stat-fill {
+      height: 100%;
+      transition: width 0.3s;
+    }
+    
+    .stat-fill.salud { background: #ff0000; }
+    .stat-fill.hambre { background: #ff8800; }
+    .stat-fill.moral { background: #00ffff; }
+    
+    button {
+      background: #004400;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      padding: 10px 15px;
+      margin: 5px 2px;
+      cursor: pointer;
+      font-family: inherit;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #00ff00;
+      color: #000;
+    }
+    
+    button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .location {
+      padding: 10px;
+      margin: 5px 0;
+      background: #1a1a1a;
+      border-left: 3px solid #00ff00;
+      cursor: pointer;
+    }
+    
+    .location:hover {
+      background: #333;
+    }
+    
+    .location.current {
+      border-left-color: #ffff00;
+      background: #333;
+    }
+    
+    .location.danger {
+      border-left-color: #ff0000;
+    }
+    
+    .npc {
+      padding: 10px;
+      margin: 8px 0;
+      background: #1a1a1a;
+      border: 1px solid #00ff00;
+    }
+    
+    .npc.dead {
+      opacity: 0.5;
+      border-color: #666;
+    }
+    
+    .npc-name {
+      color: #ffff00;
+      font-weight: bold;
+    }
+    
+    .log {
+      background: #000;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #00ff00;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    
+    .log-entry {
+      margin: 3px 0;
+    }
+    
+    .log-combat { color: #ff0000; }
+    .log-success { color: #00ff00; }
+    .log-warning { color: #ffff00; }
+    .log-death { color: #ff00ff; }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+    
+    #login {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background: #2a2a2a;
+      border: 2px solid #00ff00;
+      border-radius: 5px;
+      text-align: center;
+    }
+    
+    input {
+      background: #000;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      padding: 10px;
+      font-family: inherit;
+      width: 100%;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    
+    .zombie-count {
+      color: #ff0000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <!-- Pantalla de login -->
+    <div id="login">
+      <h1>🧟 SURVIVAL ZOMBIE</h1>
+      <p style="margin: 20px 0;">El mundo está infectado. Sobrevive.</p>
+      <input type="text" id="playerName" placeholder="Tu nombre" maxlength="20">
+      <button onclick="createPlayer()">ENTRAR AL MUNDO</button>
+    </div>
+
+    <!-- Pantalla de juego (oculta inicialmente) -->
+    <div id="gameScreen" style="display:none;">
+      <h1>🧟 SURVIVAL ZOMBIE - MVP</h1>
+      
+      <div class="container">
+        <!-- Panel izquierdo: Stats del jugador -->
+        <div class="panel">
+          <h2>👤 TU PERSONAJE</h2>
+          <div id="playerStats"></div>
+          
+          <h2 style="margin-top: 20px;">🎒 INVENTARIO</h2>
+          <div id="inventory"></div>
+          
+          <h2 style="margin-top: 20px;">📦 REFUGIO</h2>
+          <div id="refugioRecursos" style="font-size: 12px;"></div>
+        </div>
+        
+        <!-- Panel central: Mundo -->
+        <div class="panel">
+          <h2 id="locationName">📍 Ubicación</h2>
+          <p id="locationDesc" style="margin: 10px 0; color: #ccc;"></p>
+          
+          <div id="locationActions"></div>
+          
+          <h2 style="margin-top: 20px;">� CRAFTEAR</h2>
+          <div id="crafting">
+            <button onclick="craft('vendaje')">💊 Vendaje (2 mat)</button>
+            <button onclick="craft('molotov')">🔥 Molotov (3 mat, 1 comida)</button>
+            <button onclick="craft('barricada')">🚧 Barricada (5 mat)</button>
+            <button onclick="craft('trampa')">🪤 Trampa (4 mat, 1 arma)</button>
+          </div>
+          
+          <h2 style="margin-top: 20px;">�🗺️ MOVERTE A:</h2>
+          <div id="locations"></div>
+          
+          <h2 style="margin-top: 20px;">📜 LOG PERSONAL</h2>
+          <div class="log" id="log"></div>
+          
+          <h2 style="margin-top: 15px;">🌍 LOG DEL MUNDO</h2>
+          <div class="log" id="worldLog" style="max-height: 120px;"></div>
+        </div>
+        
+        <!-- Panel derecho: NPCs -->
+        <div class="panel">
+          <div id="hordeWarning" style="display: none; background: #ff0000; padding: 10px; margin-bottom: 10px; animation: blink 1s infinite;">
+            🚨 HORDA ACERCÁNDOSE
+          </div>
+          
+          <h2>🛡️ DEFENSAS REFUGIO</h2>
+          <div id="defensas" style="font-size: 20px; color: #00ffff; margin: 10px 0;"></div>
+          
+          <h2>📋 QUESTS</h2>
+          <div id="quests" style="margin: 10px 0; font-size: 13px;"></div>
+          
+          <h2>👥 NPCs EN REFUGIO</h2>
+          <div id="npcs"></div>
+          
+          <h2 style="margin-top: 20px;">🧑‍🤝‍🧑 JUGADORES AQUÍ</h2>
+          <div id="playersHere" style="font-size: 12px; min-height: 40px;">
+            <em style="color: #888;">Solo tú</em>
+          </div>
+          
+          <h2 style="margin-top: 20px;">🎭 EVENTO</h2>
+          <div id="specialEvent" style="min-height: 60px; font-size: 12px;">
+            <em style="color: #888;">Sin eventos</em>
+          </div>
+          
+          <h2 style="margin-top: 20px;">🤝 QUEST COOPERATIVA</h2>
+          <div id="questCooperativa" style="min-height: 80px; font-size: 12px; background: #1a3a3a; padding: 10px; border-radius: 5px;">
+            <em style="color: #888;">Sin quest activa</em>
+          </div>
+          
+          <h2 style="margin-top: 20px;">⏰ TIEMPO</h2>
+          <div id="worldTime" style="font-size: 18px; color: #ffff00;"></div>
+          
+          <h2 style="margin-top: 15px;">📊 TUS SKILLS</h2>
+          <div id="skills" style="font-size: 12px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+    let player = null;
+    let world = null;
+    let worldLogMessages = []; // Log de eventos del mundo
+
+    // Al cargar, verificar si hay un personaje seleccionado
+    window.addEventListener('DOMContentLoaded', () => {
+      const playerId = localStorage.getItem('playerId');
+      
+      if (!playerId) {
+        // Sin personaje, redirigir al login
+        window.location.href = '/index.html';
+        return;
+      }
+      
+      // Tenemos playerId, ocultar login y mostrar juego
+      player = { id: playerId };
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'block';
+      connectWebSocket();
+    });
+
+    function log(message, type = '') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    
+    function worldLog(message, category = '') {
+      const logDiv = document.getElementById('worldLog');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${category}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      
+      // Mantener solo últimos 20 mensajes
+      while (logDiv.children.length > 20) {
+        logDiv.removeChild(logDiv.firstChild);
+      }
+    }
+
+    async function createPlayer() {
+      const nombre = document.getElementById('playerName').value.trim();
+      
+      if (!nombre || nombre.length < 3) {
+        alert('Nombre muy corto');
+        return;
+      }
+      
+      const response = await fetch('/api/player/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        player = data.player;
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'block';
+        connectWebSocket();
+      }
+    }
+
+    function connectWebSocket() {
+      ws = new WebSocket(`ws://${window.location.host}`);
+      
+      ws.onopen = () => {
+        log('Conectado al servidor', 'success');
+        ws.send(JSON.stringify({ type: 'login', playerId: player.id }));
+      };
+      
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        handleMessage(msg);
+      };
+      
+      ws.onclose = () => {
+        log('Desconectado del servidor', 'warning');
+      };
+    }
+
+    function handleMessage(msg) {
+      switch(msg.type) {
+        case 'world:state':
+          world = msg.world;
+          if (world.players && world.players[player.id]) {
+            player = world.players[player.id];
+          }
+          renderGame();
+          break;
+          
+        case 'moved':
+          log(`Te moviste a: ${msg.location.nombre}`, 'success');
+          player.locacion = msg.location.id;
+          renderGame();
+          break;
+          
+        case 'scavenge:result':
+          const items = Object.entries(msg.found).map(([k,v]) => `${k}:${v}`).join(', ');
+          log(`Encontraste: ${items || 'nada'}`, 'success');
+          if (msg.inventario) {
+            player.inventario = msg.inventario;
+          }
+          renderGame();
+          break;
+          
+        case 'combat':
+          log(msg.message, 'combat');
+          player.salud = msg.salud;
+          renderGame();
+          break;
+          
+        case 'give:success':
+          log(`Le diste ${msg.cantidad} ${msg.item} a ${msg.npc}`, 'success');
+          if (msg.inventario) {
+            player.inventario = msg.inventario;
+          }
+          world.npcs[msg.npcState.id] = msg.npcState;
+          renderGame();
+          break;
+          
+        case 'dialogue':
+          log(`${msg.npc}: "${msg.text}"`, '');
+          break;
+          
+        case 'npc:died':
+          log(`💀 ${msg.nombre} ha muerto`, 'death');
+          if (world.npcs[msg.npcId]) {
+            world.npcs[msg.npcId].vivo = false;
+          }
+          renderGame();
+          break;
+          
+        case 'npc:updated':
+          world.npcs[msg.npcId] = msg.npc;
+          renderGame();
+          break;
+          
+        case 'horde:warning':
+          log(msg.message, 'warning');
+          document.getElementById('hordeWarning').style.display = 'block';
+          break;
+          
+        case 'horde:attacked':
+          log(msg.message, 'combat');
+          document.getElementById('hordeWarning').style.display = 'none';
+          renderGame();
+          break;
+          
+        case 'horde:npc_killed':
+          log(`💀 ${msg.npcNombre} murió en el ataque de la horda`, 'death');
+          break;
+          
+        case 'quest:new':
+          log(`📋 Nueva quest: ${msg.quest.descripcion}`, 'success');
+          if (!world.activeQuests) world.activeQuests = [];
+          world.activeQuests.push(msg.quest);
+          renderGame();
+          break;
+          
+        case 'craft:success':
+          log(`🔨 Crafteaste: ${msg.item}`, 'success');
+          if (msg.defensas) {
+            log(`🛡️ Defensas del refugio: ${msg.defensas}`, 'success');
+            if (world.locations && world.locations.refugio) {
+              world.locations.refugio.defensas = msg.defensas;
+            }
+          }
+          if (msg.inventario) {
+            player.inventario = msg.inventario;
+          }
+          renderGame();
+          break;
+          
+        case 'shoot:result':
+          log(`🔫 Mataste ${msg.killed} zombies. Quedan: ${msg.remaining}`, 'combat');
+          log(msg.warning, 'warning');
+          renderGame();
+          break;
+          
+        case 'event:special':
+          log(`🎭 EVENTO: ${msg.event.nombre}`, 'success');
+          world.activeEvents = [msg.event];
+          renderGame();
+          break;
+          
+        case 'event:resolved':
+          log(msg.resultado, 'success');
+          player.inventario = msg.inventario;
+          world.activeEvents = [];
+          renderGame();
+          break;
+          
+        case 'event:expired':
+          log('El evento expiró', 'warning');
+          world.activeEvents = [];
+          renderGame();
+          break;
+          
+        case 'world:event':
+          worldLog(msg.message, msg.category);
+          break;
+          
+        case 'player:joined':
+          worldLog(`👤 ${msg.nombre} se unió`, 'success');
+          renderGame();
+          break;
+          
+        case 'player:moved':
+          renderGame();
+          break;
+          
+        case 'trade:success':
+          log(msg.message, 'success');
+          player.inventario = msg.inventario;
+          renderGame();
+          break;
+          
+        case 'xp:gained':
+          log(`+${msg.amount} XP (${msg.xp}/${msg.xpMax})`, 'success');
+          player.xp = msg.xp;
+          player.xpParaSiguienteNivel = msg.xpMax;
+          renderGame();
+          break;
+          
+        case 'level:up':
+          log(`⭐ ¡SUBISTE A NIVEL ${msg.nivel}!`, 'success');
+          player.nivel = msg.nivel;
+          player.xpParaSiguienteNivel = msg.xpMax;
+          player.xp = 0;
+          renderGame();
+          break;
+          
+        case 'refugio:recursos':
+          if (world.locations && world.locations.refugio) {
+            world.locations.refugio.recursos = msg.recursos;
+          }
+          renderGame();
+          break;
+          
+        case 'quest:cooperativa':
+          renderQuestCooperativa(msg.quest);
+          worldLog(`🤝 QUEST COOPERATIVA: ${msg.quest.nombre}`, 'special');
+          break;
+          
+        case 'quest:votes_update':
+          updateVotosQuest(msg.votos);
+          break;
+          
+        case 'quest:resultado':
+          worldLog(`✅ Quest resuelta: ${msg.opcionGanadora}`, 'success');
+          document.getElementById('questCooperativa').innerHTML = '<em style="color: #888;">Sin quest activa</em>';
+          break;
+          
+        case 'quest:voted':
+          log(msg.message, 'success');
+          break;
+          
+        case 'error':
+          log(`ERROR: ${msg.error}`, 'warning');
+          break;
+      }
+    }
+
+    function renderGame() {
+      renderPlayerStats();
+      renderInventory();
+      renderLocation();
+      renderLocations();
+      renderNPCs();
+      renderWorldTime();
+      renderSkills();
+      renderDefensas();
+      renderQuests();
+      renderSpecialEvent();
+      renderPlayersHere();
+      renderRefugioRecursos();
+    }
+
+    function renderPlayerStats() {
+      const html = `
+        <div style="text-align: center; font-size: 60px; margin-bottom: 10px; color: ${player.color || '#00ff00'};">
+          ${player.avatar || '👤'}
+        </div>
+        <div class="stat">
+          <strong>Nombre:</strong> ${player.nombre}
+        </div>
+        <div class="stat" style="color: #ffaa00;">
+          <strong>Clase:</strong> ${(player.clase || 'superviviente').toUpperCase()}
+        </div>
+        <div class="stat">
+          ⭐ Nivel: ${player.nivel || 1} | XP: ${player.xp || 0}/${player.xpParaSiguienteNivel || 100}
+          <div class="stat-bar">
+            <div class="stat-fill" style="width: ${((player.xp || 0)/(player.xpParaSiguienteNivel || 100)*100)}%; background: #ffaa00;"></div>
+          </div>
+        </div>
+        <div class="stat">
+          💪 Fuerza: ${player.fuerza || 5} | 🛡️ Resistencia: ${player.resistencia || 5}
+        </div>
+        <div class="stat">
+          ⚡ Agilidad: ${player.agilidad || 5} | 🧠 Inteligencia: ${player.inteligencia || 5}
+        </div>
+        <div class="stat">
+          ❤️ Salud: ${player.salud}/100
+          <div class="stat-bar">
+            <div class="stat-fill salud" style="width: ${player.salud}%"></div>
+          </div>
+        </div>
+        <div class="stat">
+          🍖 Hambre: ${player.hambre}/100
+          <div class="stat-bar">
+            <div class="stat-fill hambre" style="width: ${player.hambre}%"></div>
+          </div>
+        </div>
+      `;
+      document.getElementById('playerStats').innerHTML = html;
+    }
+
+    function renderInventory() {
+      const html = Object.entries(player.inventario)
+        .map(([item, cant]) => `<div>${item}: ${cant}</div>`)
+        .join('');
+      document.getElementById('inventory').innerHTML = html || '<em>Vacío</em>';
+    }
+
+    function renderLocation() {
+      const loc = world.locations[player.locacion];
+      document.getElementById('locationName').textContent = `📍 ${loc.nombre}`;
+      document.getElementById('locationDesc').textContent = loc.descripcion;
+      
+      let actionsHtml = '';
+      
+      if (loc.tipo === 'loot') {
+        actionsHtml += `
+          <button onclick="scavenge()" style="width: 100%; padding: 15px; font-size: 16px; margin: 10px 0; background: #00aa00; cursor: pointer; border: 2px solid #00ff00;">
+            🔍 BUSCAR RECURSOS (+XP)
+          </button>
+          ${player.inventario.armas > 0 && loc.zombies > 0 ? 
+            `<button onclick="shoot()" style="width: 100%; padding: 15px; font-size: 16px; margin: 10px 0; background: #aa0000; cursor: pointer; border: 2px solid #ff0000;">
+              🔫 DISPARAR A ZOMBIES (+XP) (${player.inventario.armas} armas)
+            </button>` : ''}
+          ${loc.zombies > 0 ? `<div class="zombie-count" style="font-size: 14px; padding: 10px; background: #3a1a1a; margin: 5px 0;">⚠️ ${loc.zombies} zombies aquí</div>` : ''}
+          ${loc.nivelRuido > 30 ? `<span style="color: #ff8800;"> 🔊 RUIDOSO (${loc.nivelRuido})</span>` : ''}
+        `;
+      } else if (loc.id === 'refugio') {
+        actionsHtml += `<p style="color: #00ff00; padding: 10px; background: #1a3a1a;">✅ Estás a salvo aquí</p>`;
+      }
+      
+      document.getElementById('locationActions').innerHTML = actionsHtml;
+    }
+
+    function renderSkills() {
+      if (!player.skills) return;
+      const html = Object.entries(player.skills)
+        .map(([skill, nivel]) => {
+          const barWidth = (nivel / 10) * 100;
+          return `
+            <div style="margin: 5px 0;">
+              <strong>${skill}:</strong> ${nivel.toFixed(1)}/10
+              <div class="stat-bar">
+                <div class="stat-fill" style="width: ${barWidth}%; background: #00ffff;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      document.getElementById('skills').innerHTML = html;
+    }
+
+    function renderDefensas() {
+      const refugio = world.locations.refugio;
+      if (refugio) {
+        document.getElementById('defensas').textContent = `🛡️ ${refugio.defensas || 0}`;
+      }
+    }
+
+    function renderQuests() {
+      if (!world.activeQuests || world.activeQuests.length === 0) {
+        document.getElementById('quests').innerHTML = '<em>Sin quests activas</em>';
+        return;
+      }
+      
+      const html = world.activeQuests.map(q => `
+        <div style="background: #1a1a1a; padding: 5px; margin: 5px 0; border-left: 2px solid #ffff00;">
+          ${q.descripcion}
+        </div>
+      `).join('');
+      document.getElementById('quests').innerHTML = html;
+    }
+
+    function craft(item) {
+      ws.send(JSON.stringify({ type: 'craft', item }));
+    }
+
+    function shoot() {
+      if (confirm('¿Disparar? Atraerá más zombies por el ruido.')) {
+        ws.send(JSON.stringify({ type: 'shoot' }));
+      }
+    }
+    
+    function craft(item) {
+      ws.send(JSON.stringify({ type: 'craft', item }));
+    }
+
+    function renderLocations() {
+      const current = world.locations[player.locacion];
+      const html = current.conectado_a.map(locId => {
+        const loc = world.locations[locId];
+        const isDanger = loc.zombies > 2;
+        return `
+          <div class="location ${isDanger ? 'danger' : ''}" onclick="moveTo('${locId}')">
+            <strong>${loc.nombre}</strong>
+            ${loc.zombies > 0 ? `<span class="zombie-count">(🧟 ${loc.zombies})</span>` : ''}
+          </div>
+        `;
+      }).join('');
+      document.getElementById('locations').innerHTML = html;
+    }
+
+    function renderNPCs() {
+      const html = Object.values(world.npcs)
+        .filter(npc => npc.locacion === 'refugio')
+        .map(npc => `
+          <div class="npc ${!npc.vivo ? 'dead' : ''}">
+            <div class="npc-name">${npc.nombre} ${!npc.vivo ? '💀' : ''}</div>
+            ${npc.vivo ? `
+              <div style="font-size: 11px; margin: 5px 0;">
+                ❤️ ${npc.salud} | 🍖 ${npc.hambre} | 😊 ${npc.moral}
+              </div>
+              <button onclick="talkTo('${npc.id}')">💬</button>
+              <button onclick="giveItem('${npc.id}', 'comida')">🍖</button>
+              <button onclick="giveItem('${npc.id}', 'medicinas')">💊</button>
+            ` : '<em>Muerto</em>'}
+          </div>
+        `).join('');
+      document.getElementById('npcs').innerHTML = html;
+    }
+
+    function renderWorldTime() {
+      document.getElementById('worldTime').textContent = `Día ${Math.floor(world.simulationTime / 144)}, ${(world.simulationTime % 144) * 10} min`;
+    }
+
+    function moveTo(locId) {
+      ws.send(JSON.stringify({ type: 'move', targetId: locId }));
+    }
+
+    function scavenge() {
+      ws.send(JSON.stringify({ type: 'scavenge' }));
+    }
+
+    function talkTo(npcId) {
+      ws.send(JSON.stringify({ type: 'talk', npcId }));
+    }
+
+    function giveItem(npcId, item) {
+      ws.send(JSON.stringify({ type: 'give', npcId, item, cantidad: 1 }));
+    }
+    
+    function renderSpecialEvent() {
+      if (!world.activeEvents || world.activeEvents.length === 0) {
+        document.getElementById('specialEvent').innerHTML = '<em style="color: #888;">Sin eventos</em>';
+        return;
+      }
+      
+      const evento = world.activeEvents[0];
+      const html = `
+        <div style="background: #3a2a1a; padding: 10px; border: 2px solid #ff8800; border-radius: 5px;">
+          <strong style="color: #ffaa00;">${evento.nombre}</strong>
+          <p style="margin: 8px 0; font-size: 11px; color: #ddd;">${evento.descripcion}</p>
+          ${evento.opciones.map((op, idx) => {
+            const costoStr = Object.entries(op.costo).map(([k,v]) => `${k}:${v}`).join(', ');
+            return `<button onclick="respondEvent('${evento.id}', ${idx})" style="display: block; width: 100%; margin: 5px 0; padding: 5px; font-size: 11px;">
+              ${op.texto} ${costoStr ? `(Costo: ${costoStr})` : ''}
+            </button>`;
+          }).join('')}
+          <div style="margin-top: 8px; font-size: 10px; color: #ff5555;">
+            Expira en ${evento.expiresIn - (world.simulationTime - evento.timestamp)} ticks
+          </div>
+        </div>
+      `;
+      document.getElementById('specialEvent').innerHTML = html;
+    }
+    
+    function respondEvent(eventId, opcionIndex) {
+      ws.send(JSON.stringify({ type: 'event:respond', eventId, opcionIndex }));
+    }
+    
+    function renderDefensas() {
+      if (world.locations && world.locations.refugio) {
+        document.getElementById('defensas').textContent = `🛡️ ${world.locations.refugio.defensas}`;
+      }
+    }
+    
+    function renderQuests() {
+      if (!world.activeQuests || world.activeQuests.length === 0) {
+        document.getElementById('quests').innerHTML = '<em style="color: #888;">Sin quests</em>';
+        return;
+      }
+      
+      const html = world.activeQuests.map(q => `
+        <div style="margin: 5px 0; padding: 5px; background: #1a2a1a; border-left: 3px solid #00ff00;">
+          ${q.descripcion}
+        </div>
+      `).join('');
+      document.getElementById('quests').innerHTML = html;
+    }
+    
+    function renderSkills() {
+      const html = Object.entries(player.skills || {}).map(([skill, val]) => `
+        <div style="margin: 3px 0;">
+          ${skill}: ${val.toFixed(1)}/10
+        </div>
+      `).join('');
+      document.getElementById('skills').innerHTML = html;
+    }
+    
+    function renderPlayersHere() {
+      if (!world || !world.players) {
+        document.getElementById('playersHere').innerHTML = '<em style="color: #888;">Solo tú</em>';
+        return;
+      }
+      
+      const playersInLocation = Object.values(world.players)
+        .filter(p => p.locacion === player.locacion && p.id !== player.id);
+      
+      if (playersInLocation.length === 0) {
+        document.getElementById('playersHere').innerHTML = '<em style="color: #888;">Solo tú</em>';
+        return;
+      }
+      
+      const html = playersInLocation.map(p => `
+        <div style="margin: 5px 0; padding: 5px; background: #1a3a1a; border-left: 2px solid #00ff00;">
+          <strong>${p.nombre}</strong>
+          <div style="font-size: 10px; color: #aaa;">
+            ❤️ ${p.salud} | 🎒 ${Object.values(p.inventario || {}).reduce((a,b) => a+b, 0)} items
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('playersHere').innerHTML = html;
+    }
+    
+    function renderRefugioRecursos() {
+      if (!world || !world.locations || !world.locations.refugio) return;
+      
+      const recursos = world.locations.refugio.recursos;
+      const html = Object.entries(recursos).map(([item, cant]) => {
+        let color = '#00ff00';
+        if (cant < 5) color = '#ff0000';
+        else if (cant < 10) color = '#ffaa00';
+        
+        return `<div style="margin: 3px 0; color: ${color};">${item}: ${cant}</div>`;
+      }).join('');
+      
+      document.getElementById('refugioRecursos').innerHTML = html || '<em style="color: #888;">Sin recursos</em>';
+    }
+
+    function renderQuestCooperativa(quest) {
+      const html = `
+        <div style="background: #2a4a2a; padding: 10px; border-radius: 5px; border: 2px solid #ffff00;">
+          <strong style="color: #ffff00; font-size: 14px;">${quest.nombre}</strong>
+          <p style="margin: 10px 0; color: #ccc;">${quest.descripcion}</p>
+          <div style="margin-top: 10px;">
+            ${quest.opciones.map(opt => `
+              <button onclick="votarQuest('${opt}')" style="width: 100%; padding: 8px; margin: 3px 0;">
+                ${opt} <span id="votos-${opt.replace(/\s/g, '')}" style="color: #ffaa00;"></span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('questCooperativa').innerHTML = html;
+    }
+
+    function updateVotosQuest(votos) {
+      Object.keys(votos).forEach(opcion => {
+        const el = document.getElementById(`votos-${opcion.replace(/\s/g, '')}`);
+        if (el) {
+          el.textContent = `(${votos[opcion].length} votos)`;
+        }
+      });
+    }
+
+    function votarQuest(opcion) {
+      ws.send(JSON.stringify({
+        type: 'quest:vote',
+        opcion: opcion
+      }));
+    }
+  </script>
+</body>
+</html>

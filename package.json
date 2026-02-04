@@ -1,0 +1,19 @@
+{
+  "name": "survival-zombie",
+  "version": "2.0.0",
+  "description": "Survival Zombie - Multiplayer RPG con mundo vivo, NPCs, crafting y quests cooperativas",
+  "main": "server/survival_mvp.js",
+  "scripts": {
+    "start": "node server/survival_mvp.js",
+    "dev": "nodemon server/survival_mvp.js",
+    "old": "node server/index_v2.js"
+  },
+  "keywords": ["zombie", "survival", "multiplayer", "websocket", "rpg", "cooperative"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.16.0",
+    "better-sqlite3": "^9.4.0"
+  }
+}
