@@ -897,17 +897,20 @@ wss.on('connection', (ws) => {
                 world: WORLD
             }));
 
-            broadcast({
-                type: 'player:joined',
-                playerId,
-                nombre: WORLD.players[playerId].nombre
-            }, playerId);
+            // Verificar que el jugador existe en WORLD.players
+            if (WORLD.players[playerId]) {
+                broadcast({
+                    type: 'player:joined',
+                    playerId,
+                    nombre: WORLD.players[playerId].nombre
+                }, playerId);
 
-            broadcast({
-                type: 'world:event',
-                message: `👤 ${WORLD.players[playerId].nombre} se unió al servidor`,
-                category: 'player'
-            });
+                broadcast({
+                    type: 'world:event',
+                    message: `👤 ${WORLD.players[playerId].nombre} se unió al servidor`,
+                    category: 'player'
+                });
+            }
 
             return;
         }
@@ -915,6 +918,15 @@ wss.on('connection', (ws) => {
         if (!playerId) return;
 
         const player = WORLD.players[playerId];
+        
+        // Verificar que el jugador existe
+        if (!player) {
+            ws.send(JSON.stringify({ 
+                type: 'error', 
+                error: 'Jugador no encontrado. Recarga la página.' 
+            }));
+            return;
+        }
 
         // MOVERSE
         if (msg.type === 'move') {
