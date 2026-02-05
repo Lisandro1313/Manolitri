@@ -5,6 +5,7 @@
 ## 🎮 Características
 
 ### 🎭 Sistema de Personajes
+
 - **Login/Registro** con persistencia en base de datos
 - **4 Clases**: Soldado, Médico, Ingeniero, Superviviente
 - **Atributos personalizables**: Fuerza, Resistencia, Agilidad, Inteligencia
@@ -12,6 +13,7 @@
 - **Sistema de niveles y XP** con progreso guardado
 
 ### 🌍 Mundo Vivo
+
 - **6 locaciones** explorables con zombies dinámicos
 - **4 NPCs** con rutinas autónomas:
   - Salen a explorar y traen recursos
@@ -22,12 +24,14 @@
 - **Eventos emergentes** con decisiones y consecuencias
 
 ### 🤝 Multijugador Cooperativo
+
 - **Quests cooperativas** con votación en tiempo real
 - Decisiones grupales que afectan el refugio
 - Chat en tiempo real (logs del mundo)
 - Ver otros jugadores en tu ubicación
 
 ### ⚔️ Mecánicas de Juego
+
 - **Scavenge**: Buscar recursos en locaciones (cooldown 3s)
 - **Crafting**: Crear items y defensas (cooldown 2s)
 - **Combate**: Disparar zombies pero genera ruido (cooldown 4s)
@@ -83,17 +87,20 @@ git push -u origin main
 6. ¡Listo! Comparte la URL con amigos: `https://tu-proyecto.up.railway.app`
 
 **Variables de entorno (opcional):**
+
 - `PORT` = 3000 (Railway lo asigna automático)
 
 ## 🎯 Cómo Jugar Multijugador
 
 ### ✅ Opción 1: Railway/Render (MEJOR)
+
 - Deploy el proyecto
 - Comparte la URL pública con amigos
 - Todos crean cuenta y personaje
 - ¡Jueguen juntos desde cualquier lugar!
 
 ### Opción 2: LAN (misma WiFi)
+
 ```bash
 # Host encuentra su IP
 ipconfig  # Windows
@@ -104,6 +111,7 @@ http://TU_IP:3000
 ```
 
 ### Opción 3: Túnel (ngrok)
+
 ```bash
 # Instalar ngrok
 ngrok http 3000
@@ -141,24 +149,29 @@ survival-zombie/
 ## 🏆 Sistema de Clases
 
 ### 🎖️ Soldado
+
 - +2 Fuerza | +2 Combate
 - Experto en combate y armas
 
-### ⚕️ Médico  
+### ⚕️ Médico
+
 - +2 Inteligencia | +2 Medicina
 - Salva vidas y cura heridas
 
 ### 🔧 Ingeniero
+
 - +1 Inteligencia | +3 Mecánica
 - Maestro del crafteo y construcción
 
 ### 🎒 Superviviente
+
 - +1 Agilidad | +2 Supervivencia | +1 Sigilo
 - Adaptable y sigiloso
 
 ## 🤝 Quests Cooperativas
 
 Aparecen cada 4 minutos con 2+ jugadores:
+
 - 🏥 **Expedición al Hospital** - Riesgo vs recompensa
 - 🚁 **Señal de Radio Misteriosa** - Aliados o trampa
 - 👥 **Grupo de Refugiados** - Moral vs recursos
@@ -169,8 +182,9 @@ Todos votan, la mayoría decide, las consecuencias son reales.
 ## ⚙️ Sistema de Cooldowns
 
 Para evitar spam y hacer el juego más estratégico:
+
 - **Scavenge**: 3 segundos
-- **Craft**: 2 segundos  
+- **Craft**: 2 segundos
 - **Shoot**: 4 segundos
 
 ## 📝 Comandos Git
@@ -196,11 +210,13 @@ git checkout main
 ## 🐛 Troubleshooting
 
 **Error: Cannot find module**
+
 ```bash
 npm install
 ```
 
 **Puerto 3000 en uso**
+
 ```bash
 # Windows
 netstat -ano | findstr :3000
@@ -212,6 +228,7 @@ kill -9 PID
 ```
 
 **WebSocket no conecta en Railway**
+
 - Asegúrate que Railway generó un dominio público
 - WebSocket usa la misma URL (cambia http→ws automático)
 

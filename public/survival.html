@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🧟 Survival Zombie MVP</title>
+  <title>💻 Z-SURVIVAL.exe</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -11,11 +11,11 @@
       font-family: 'Courier New', monospace;
       background: #1a1a1a;
       color: #00ff00;
-      padding: 20px;
+      padding: 10px;
     }
     
     #game {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     
@@ -23,14 +23,211 @@
       text-align: center;
       color: #ff0000;
       text-shadow: 2px 2px #000;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+    }
+
+    /* SISTEMA DE PESTAÑAS */
+    .tabs-container {
+      background: #2a2a2a;
+      border: 2px solid #00ff00;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .tabs-header {
+      display: flex;
+      background: #1a1a1a;
+      border-bottom: 2px solid #00ff00;
+      overflow-x: auto;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      background: #2a2a2a;
+      color: #00ff00;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      border-right: 1px solid #004400;
+      transition: all 0.3s;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      background: #3a3a3a;
+    }
+
+    .tab-button.active {
+      background: #00ff00;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: #ff0000;
+      color: #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+    
+    @keyframes flashGreen {
+      0% { box-shadow: 0 0 0 rgba(0, 255, 0, 0); }
+      50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
+      100% { box-shadow: 0 0 0 rgba(0, 255, 0, 0); }
+    }
+    
+    @keyframes flashRed {
+      0% { box-shadow: 0 0 0 rgba(255, 0, 0, 0); }
+      50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
+      100% { box-shadow: 0 0 0 rgba(255, 0, 0, 0); }
+    }
+    
+    .flash-success {
+      animation: flashGreen 0.5s ease-out;
+    }
+    
+    .flash-danger {
+      animation: flashRed 0.5s ease-out;
+    }
+    
+    #actionFeedback {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 255, 0, 0.95);
+      color: #000;
+      padding: 20px 40px;
+      border-radius: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 10000;
+      display: none;
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+    }
+    
+    /* Tabs de crafteo */
+    .craft-tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    
+    .craft-tab {
+      padding: 8px 15px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.3s;
+    }
+    
+    .craft-tab:hover {
+      background: #2a2a2a;
+      border-color: #00ff00;
+    }
+    
+    .craft-tab.active {
+      background: #00ff00;
+      color: #000;
+      border-color: #00ff00;
+      font-weight: bold;
+    }
+    
+    .craft-section {
+      display: none;
+    }
+    
+    .craft-section.active {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 5px;
+    }
+    
+    /* Refugio visual */
+    #refugioVisual {
+      text-align: center;
+      font-size: 48px;
+      margin: 10px 0;
+      line-height: 1.2;
+    }
+    
+    /* Botón de sonido */
+    #soundToggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #1a1a1a;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 20px;
+      z-index: 1000;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    
+    #soundToggle:hover {
+      background: #00ff00;
+      color: #000;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 15px;
+      animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     .container {
       display: grid;
       grid-template-columns: 1fr 2fr 1fr;
-      gap: 20px;
-      margin-top: 20px;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      
+      .tab-button {
+        padding: 12px 15px;
+        font-size: 12px;
+      }
     }
     
     .panel {
@@ -45,6 +242,7 @@
       margin-bottom: 10px;
       border-bottom: 1px solid #00ff00;
       padding-bottom: 5px;
+      font-size: 16px;
     }
     
     .stat {
@@ -178,9 +376,223 @@
       color: #ff0000;
       font-weight: bold;
     }
+
+    .online-player {
+      padding: 8px;
+      margin: 5px 0;
+      background: #1a3a1a;
+      border-left: 3px solid #00ff00;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+
+    .online-player-name {
+      color: #00ff00;
+      font-weight: bold;
+    }
+
+    .online-player-info {
+      color: #888;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .online-count {
+      display: inline-block;
+      background: #00ff00;
+      color: #000;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2a2a2a;
+      border: 2px solid #00ff00;
+      padding: 15px 20px;
+      border-radius: 5px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+      max-width: 300px;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.success { border-color: #00ff00; }
+    .notification.warning { border-color: #ffff00; }
+    .notification.danger { border-color: #ff0000; }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .connection-status {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background: #2a2a2a;
+      border: 2px solid #00ff00;
+      border-radius: 5px;
+      font-size: 11px;
+      z-index: 999;
+    }
+
+    .connection-status.connected { border-color: #00ff00; color: #00ff00; }
+    .connection-status.disconnected { border-color: #ff0000; color: #ff0000; }
+    
+    /* Chat y Social mejorado */
+    .chat-section { display: none; }
+    .chat-section.active { display: block; }
+    
+    .dm-message {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 11px;
+    }
+    
+    .dm-sent {
+      background: #1a2a1a;
+      border-left: 3px solid #00ff00;
+      text-align: right;
+    }
+    
+    .dm-received {
+      background: #2a1a1a;
+      border-left: 3px solid #ff8800;
+    }
+    
+    .player-card-inspect {
+      background: #1a2a1a;
+      border: 2px solid #00ff00;
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .player-card-inspect:hover {
+      background: #2a3a2a;
+      border-color: #00ffff;
+      transform: translateX(5px);
+    }
+    
+    .player-card-inspect .rank-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 24px;
+    }
+    
+    .title-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      background: linear-gradient(135deg, #1a1a3a, #3a1a3a);
+      border: 1px solid #8888ff;
+      border-radius: 3px;
+      font-size: 9px;
+      color: #aaaaff;
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    
+    .leaderboard-entry {
+      background: #1a1a2a;
+      border-left: 3px solid #888;
+      padding: 10px;
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    
+    .leaderboard-entry:hover {
+      background: #2a2a3a;
+      transform: translateX(5px);
+    }
+    
+    .leaderboard-entry.rank-1 { 
+      border-left-color: #ffd700; 
+      background: linear-gradient(90deg, #2a2a1a, #1a1a1a);
+    }
+    .leaderboard-entry.rank-2 { 
+      border-left-color: #c0c0c0; 
+      background: linear-gradient(90deg, #2a2a2a, #1a1a1a);
+    }
+    .leaderboard-entry.rank-3 { 
+      border-left-color: #cd7f32; 
+      background: linear-gradient(90deg, #2a1a1a, #1a1a1a);
+    }
+    
+    .profile-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #0a0a0a;
+      border: 3px solid #00ff00;
+      padding: 20px;
+      z-index: 9999;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
+      border-radius: 5px;
+    }
+    
+    .profile-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9998;
+      backdrop-filter: blur(3px);
+    }
+    
+    .stat-comparison {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px;
+      margin: 3px 0;
+      background: #1a1a1a;
+      font-size: 11px;
+    }
+    
+    .stat-better { color: #ff8888; }
+    .stat-worse { color: #88ff88; }
   </style>
 </head>
 <body>
+  <!-- Indicador de estado de conexión -->
+  <div id="connectionStatus" class="connection-status connected">
+    🟢 Conectado
+  </div>
+
   <div id="game">
     <!-- Pantalla de login -->
     <div id="login">
@@ -192,106 +604,453 @@
 
     <!-- Pantalla de juego (oculta inicialmente) -->
     <div id="gameScreen" style="display:none;">
-      <h1>🧟 SURVIVAL ZOMBIE - MVP</h1>
+      <h1>💻 Z-SURVIVAL.exe <span style="font-size: 14px; color: #888; font-weight: normal;">// alpha build</span></h1>
       
-      <div class="container">
-        <!-- Panel izquierdo: Stats del jugador -->
-        <div class="panel">
-          <h2>👤 TU PERSONAJE</h2>
-          <div id="playerStats"></div>
-          
-          <h2 style="margin-top: 20px;">🎒 INVENTARIO</h2>
-          <div id="inventory"></div>
-          
-          <h2 style="margin-top: 20px;">📦 REFUGIO</h2>
-          <div id="refugioRecursos" style="font-size: 12px;"></div>
+      <!-- SISTEMA DE PESTAÑAS -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-button active" onclick="switchTab('main')">
+            🎮 JUEGO
+          </button>
+          <button class="tab-button" onclick="switchTab('events')" id="tab-btn-events">
+            📜 EVENTOS
+            <span class="tab-badge" id="badge-events" style="display: none;">!</span>
+          </button>
+          <button class="tab-button" onclick="switchTab('social')" id="tab-btn-social">
+            👥 SOCIAL
+            <span class="tab-badge" id="badge-social" style="display: none;">!</span>
+          </button>
+          <button class="tab-button" onclick="switchTab('progression')">
+            📊 PROGRESIÓN
+          </button>
+          <button class="tab-button" onclick="switchTab('advanced')">
+            ⚡ AVANZADO
+          </button>
         </div>
-        
-        <!-- Panel central: Mundo -->
-        <div class="panel">
-          <h2 id="locationName">📍 Ubicación</h2>
-          <p id="locationDesc" style="margin: 10px 0; color: #ccc;"></p>
-          
-          <div id="locationActions"></div>
-          
-          <h2 style="margin-top: 20px;">🔨 CRAFTEAR</h2>
-          <div id="crafting" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 11px;">
-            <button onclick="craft('vendaje')">💊 Vendaje (2 mat)</button>
-            <button onclick="craft('molotov')">🔥 Molotov (3 mat, 1 com)</button>
-            <button onclick="craft('barricada')">🚧 Barricada (5 mat)</button>
-            <button onclick="craft('trampa')">🪤 Trampa (4 mat, 1 arm)</button>
-            <button onclick="craft('antibiotico')" style="background: #1a4a1a;">💉 Antibiótico (2 med, 1 mat)</button>
-            <button onclick="craft('machete')" style="background: #4a4a1a;">🔪 Machete (6 mat, 1 arm)</button>
-            <button onclick="craft('pistola_mejorada')" style="background: #4a1a1a;">🔫 Pistola+ (3 arm, 5 mat)</button>
-            <button onclick="craft('armadura_ligera')" style="background: #1a3a4a;">🦺 Armadura (8 mat, 2 com)</button>
-            <button onclick="craft('botiquin')" style="background: #3a1a4a;">⚕️ Botiquín (3 med, 2 mat)</button>
-            <button onclick="craft('explosivo')" style="background: #4a1a2a;">💣 Explosivo (10 mat, 2 arm, 3 com)</button>
-            <button onclick="craft('radio')" style="background: #2a2a4a;">📻 Radio (15 mat, 1 arm)</button>
-            <button onclick="craft('generador')" style="background: #3a3a1a;">⚡ Generador (20 mat, 3 arm)</button>
-          </div>
-          
-          <h2 style="margin-top: 20px;">�🗺️ MOVERTE A:</h2>
-          <div id="locations"></div>
-          
-          <h2 style="margin-top: 20px;">📜 LOG PERSONAL</h2>
-          <div class="log" id="log"></div>
-          
-          <h2 style="margin-top: 15px;">🌍 LOG DEL MUNDO</h2>
-          <div class="log" id="worldLog" style="max-height: 120px;"></div>
-          
-          <h2 style="margin-top: 15px;">💬 CHAT</h2>
-          <div class="log" id="chatLog" style="max-height: 150px; background: #1a1a2e;"></div>
-          <div style="display: flex; gap: 5px; margin-top: 5px;">
-            <input type="text" id="chatInput" placeholder="Escribe un mensaje..." maxlength="100" style="flex: 1; padding: 8px; font-size: 12px;">
-            <button onclick="sendChat()" style="padding: 8px 15px;">Enviar</button>
+
+        <!-- PESTAÑA 1: JUEGO PRINCIPAL -->
+        <div id="tab-main" class="tab-content active">
+          <div class="container">
+            <!-- Panel izquierdo: Stats del jugador -->
+            <div class="panel">
+              <h2>👤 TU PERSONAJE</h2>
+              <div id="playerStats"></div>
+              
+              <h2 style="margin-top: 20px;">🎒 INVENTARIO</h2>
+              <div id="inventory"></div>
+              
+              <h2 style="margin-top: 20px;">📦 REFUGIO</h2>
+              <div id="refugioRecursos" style="font-size: 12px;"></div>
+
+              <div id="hordeWarning" style="display: none; background: #ff0000; padding: 10px; margin-top: 15px; animation: blink 1s infinite;">
+                🚨 HORDA ACERCÁNDOSE
+              </div>
+            </div>
+            
+            <!-- Panel central: Mundo y acciones -->
+            <div class="panel">
+              <h2 id="locationName">📍 Ubicación</h2>
+              <p id="locationDesc" style="margin: 10px 0; color: #ccc;"></p>
+              
+              <div id="locationActions"></div>
+              
+              <h2 style="margin-top: 20px;">� LOG PERSONAL</h2>
+              <div class="log" id="log"></div>
+              
+              <h2 style="margin-top: 15px;">🌍 LOG DEL MUNDO</h2>
+              <div class="log" id="worldLog" style="max-height: 120px;"></div>
+              
+              <h2 style="margin-top: 20px;">🗺️ MOVERTE A:</h2>
+              <div id="locations"></div>
+              
+              <h2 style="margin-top: 20px;">🔨 CRAFTEAR</h2>
+              <div class="craft-tabs">
+                <button class="craft-tab active" onclick="switchCraftTab('basic')">BÁSICO</button>
+                <button class="craft-tab" onclick="switchCraftTab('advanced')">AVANZADO</button>
+                <button class="craft-tab" onclick="switchCraftTab('epic')">LEGENDARIO</button>
+              </div>
+              
+              <div id="craft-basic" class="craft-section active" style="font-size: 11px;">
+                <button onclick="craft('vendaje')" style="background: #003300; border: 1px solid #006600;">💊 Vendaje<br><small>(2 mat)</small></button>
+                <button onclick="craft('molotov')" style="background: #330000; border: 1px solid #660000;">🔥 Molotov<br><small>(3 mat, 1 com)</small></button>
+                <button onclick="craft('barricada')" style="background: #003333; border: 1px solid #006666;">🚧 Barricada<br><small>(5 mat)</small></button>
+                <button onclick="craft('trampa')" style="background: #333300; border: 1px solid #666600;">🪤 Trampa<br><small>(4 mat, 1 arm)</small></button>
+              </div>
+              
+              <div id="craft-advanced" class="craft-section" style="font-size: 11px;">
+                <button onclick="craft('antibiotico')" style="background: #1a4a1a; border: 2px solid #00ff00;">💉 Antibiótico<br><small>(2 med, 1 mat)</small></button>
+                <button onclick="craft('machete')" style="background: #4a1a1a; border: 2px solid #ff6600;">🔪 Machete<br><small>(6 mat, 1 arm)</small></button>
+                <button onclick="craft('pistola_mejorada')" style="background: #3a0a0a; border: 2px solid #ff0000;">🔫 Pistola+<br><small>(3 arm, 5 mat)</small></button>
+                <button onclick="craft('armadura_ligera')" style="background: #1a3a4a; border: 2px solid #0088ff;">🦺 Armadura<br><small>(8 mat, 2 com)</small></button>
+                <button onclick="craft('botiquin')" style="background: #2a1a3a; border: 2px solid #aa00ff;">⚕️ Botiquín<br><small>(3 med, 2 mat)</small></button>
+                <button onclick="craft('radio')" style="background: #2a2a4a; border: 2px solid #4488ff;">📻 Radio<br><small>(15 mat, 1 arm)</small></button>
+              </div>
+              
+              <div id="craft-epic" class="craft-section" style="font-size: 11px;">
+                <button onclick="craft('explosivo')" style="background: #4a1a2a; border: 3px solid #ff0000;">💣 Explosivo<br><small>(10 mat, 2 arm, 3 com)</small></button>
+                <button onclick="craft('generador')" style="background: #3a3a1a; border: 2px solid #ffff00;">⚡ Generador<br><small>(20 mat, 3 arm)</small></button>
+              </div>
+            </div>
+            
+            <!-- Panel derecho: Info rápida -->
+            <div class="panel">
+              <h2>🛡️ DEFENSAS REFUGIO</h2>
+              <div id="defensas" style="font-size: 20px; color: #00ffff; margin: 10px 0;"></div>
+
+              <h2>🌙 CICLO DÍA/NOCHE</h2>
+              <div id="timeDisplay" style="font-size: 18px; text-align: center; margin: 10px 0;">
+                ☀️ Día 1 - 08:00
+              </div>
+
+              <h2 style="margin-top: 15px;">🗺️ LOCACIÓN ACTUAL</h2>
+              <div id="locationInfo" style="font-size: 12px; line-height: 1.6;">
+                <div id="locationZombies">🧟 Zombies: 0</div>
+                <div id="locationRuido">🔊 Ruido: 0</div>
+                <div id="locationDefensas">🛡️ Defensas: 0</div>
+              </div>
+
+              <h2 style="margin-top: 15px;">📋 ACCIONES RÁPIDAS</h2>
+              <div style="display: grid; gap: 5px; font-size: 11px;">
+                <button onclick="quickAction('scavenge')" style="padding: 8px; background: #00aa00; border: 2px solid #00ff00;">
+                  🔍 Buscar Recursos<br><small style="opacity: 0.8;">+XP +Items</small>
+                </button>
+                <button onclick="quickAction('attack')" style="padding: 8px; background: #aa0000; border: 2px solid #ff0000;">
+                  ⚔️ Atacar Zombies<br><small style="opacity: 0.8;">Alto riesgo</small>
+                </button>
+                <button onclick="quickAction('rest')" style="padding: 8px; background: #004444; border: 1px solid #008888;">
+                  😴 Descansar<br><small style="opacity: 0.8;">+10 salud -5 hambre</small>
+                </button>
+                <button onclick="quickAction('eat')" style="padding: 8px; background: #443300; border: 1px solid #886600;">
+                  🍖 Comer<br><small style="opacity: 0.8;">+40 hambre +5 salud</small>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        
-        <!-- Panel derecho: NPCs -->
-        <div class="panel">
-          <div id="hordeWarning" style="display: none; background: #ff0000; padding: 10px; margin-bottom: 10px; animation: blink 1s infinite;">
-            🚨 HORDA ACERCÁNDOSE
+
+        <!-- PESTAÑA 2: EVENTOS & MISIONES -->
+        <div id="tab-events" class="tab-content">
+          <div class="container">
+            <div class="panel">
+              <h2>📜 MISIONES ACTIVAS <span id="missionCount" style="font-size: 12px; color: #ffaa00;"></span></h2>
+              <div id="missionsPanel" style="font-size: 11px; max-height: 300px; overflow-y: auto;">
+                <em style="color: #888;">Sin misiones disponibles</em>
+              </div>
+              
+              <h2 style="margin-top: 20px;">📜 LOG PERSONAL</h2>
+              <div class="log" id="log2" style="max-height: 200px;"></div>
+            </div>
+
+            <div class="panel">
+              <h2>📋 QUESTS</h2>
+              <div id="quests" style="margin: 10px 0; font-size: 13px;"></div>
+
+              <h2 style="margin-top: 20px;">🤝 QUEST COOPERATIVA</h2>
+              <div id="questCooperativa" style="min-height: 80px; font-size: 12px; background: #1a3a3a; padding: 10px; border-radius: 5px;">
+                <em style="color: #888;">Sin quest activa</em>
+              </div>
+              
+              <h2 style="margin-top: 20px;">💬 DIÁLOGOS ACTIVOS</h2>
+              <div id="interactiveDialogue" style="min-height: 120px; font-size: 12px; background: #1a2a3a; padding: 10px; border-radius: 5px;">
+                <em style="color: #888;">Sin conversaciones activas</em>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>🎭 EVENTO ESPECIAL</h2>
+              <div id="specialEvent" style="min-height: 100px; font-size: 12px;">
+                <em style="color: #888;">Sin eventos</em>
+              </div>
+
+              <h2 style="margin-top: 20px;">👥 NPCs EN REFUGIO</h2>
+              <div id="npcs"></div>
+
+              <h2 style="margin-top: 20px;">🧑‍🤝‍🧑 JUGADORES AQUÍ</h2>
+              <div id="playersHere" style="font-size: 12px; min-height: 40px;">
+                <em style="color: #888;">Solo tú</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: SOCIAL -->
+        <div id="tab-social" class="tab-content">
+          <div class="container">
+            <div class="panel">
+              <h2>🌍 JUGADORES ONLINE <span id="onlineCount" class="online-count">0</span></h2>
+              <div id="onlinePlayers" style="font-size: 12px; max-height: 400px; overflow-y: auto;">
+                <em style="color: #888;">Cargando...</em>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>👥 MI GRUPO <span id="groupMemberCount" style="font-size: 12px; color: #00ff00;"></span></h2>
+              <div id="groupPanel" style="font-size: 12px;">
+                <button onclick="createGroup()" style="width: 100%; padding: 10px; margin: 5px 0;">➕ Crear Grupo</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>💬 CHAT & MENSAJES</h2>
+              <div class="craft-tabs" style="margin-bottom: 5px;">
+                <button class="craft-tab active" onclick="switchChatTab('global')">🌐 GLOBAL</button>
+                <button class="craft-tab" onclick="switchChatTab('dms')" id="dmTabBtn">
+                  💌 PRIVADOS
+                  <span id="dmBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff0000; color: #fff; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; line-height: 16px;">0</span>
+                </button>
+              </div>
+              
+              <!-- Chat Global -->
+              <div id="chat-global" class="chat-section active">
+                <div class="log" id="chatLog" style="max-height: 300px; background: #1a1a2e;"></div>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                  <input type="text" id="chatInput" placeholder="Mensaje global..." maxlength="100" style="flex: 1; padding: 10px; font-size: 12px;" onkeypress="if(event.key==='Enter') sendChat()">
+                  <button onclick="sendChat()" style="padding: 10px 15px;">📤</button>
+                </div>
+                <div style="margin-top: 5px; font-size: 10px; color: #888;">
+                  Comandos: /help /stats /online /loc /skills
+                </div>
+              </div>
+              
+              <!-- Mensajes Privados -->
+              <div id="chat-dms" class="chat-section">
+                <div style="margin-bottom: 10px;">
+                  <label style="font-size: 11px; color: #888;">Enviar a:</label>
+                  <select id="dmTargetSelect" style="width: 100%; padding: 5px; background: #1a1a1a; border: 1px solid #333; color: #fff; margin: 5px 0;">
+                    <option value="">Selecciona jugador...</option>
+                  </select>
+                </div>
+                <div id="dmLog" style="height: 250px; overflow-y: auto; border: 1px solid #333; padding: 10px; background: #0a0a0a; margin-bottom: 10px;"></div>
+                <div style="display: flex; gap: 5px;">
+                  <input type="text" id="dmInput" placeholder="Mensaje privado..." maxlength="100" style="flex: 1; padding: 10px; background: #1a1a1a; border: 1px solid #333; color: #fff; font-size: 12px;" onkeypress="if(event.key==='Enter') sendDM()">
+                  <button onclick="sendDM()" style="padding: 10px 15px;">📨</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="container" style="margin-top: 15px;">
+            <div class="panel" style="grid-column: span 3;">
+              <h2>💱 COMERCIO ENTRE JUGADORES</h2>
+              <div id="tradePanel" style="font-size: 12px;">
+                <div style="margin: 10px 0;">
+                  <p style="color: #888; margin-bottom: 10px;">Selecciona un jugador y crea una oferta de intercambio</p>
+                  <select id="tradeTargetSelect" style="width: 100%; padding: 8px; background: #000; color: #00ff00; border: 1px solid #00ff00; margin-bottom: 10px;">
+                    <option>Cargando jugadores...</option>
+                  </select>
+                  <button onclick="openTradeDialog()" style="width: 100%; padding: 10px;">🤝 Crear Oferta de Intercambio</button>
+                </div>
+                <h3 style="margin-top: 15px;">Ofertas Recibidas:</h3>
+                <div id="tradeOffers" style="max-height: 200px; overflow-y: auto;">
+                  <em style="color: #888;">Sin ofertas pendientes</em>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 4: PROGRESIÓN -->
+        <div id="tab-progression" class="tab-content">
+          <div class="container">
+            <div class="panel">
+              <h2>🏆 LOGROS <span id="achievementCount" style="font-size: 12px; color: #ffaa00;"></span></h2>
+              <div id="achievements" style="font-size: 11px; max-height: 400px; overflow-y: auto;">
+                <em style="color: #888;">Sin logros desbloqueados</em>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>📊 TUS ESTADÍSTICAS</h2>
+              <div id="playerStats2" style="font-size: 12px; line-height: 1.8;">
+                <div>🧟 Zombies: 0</div>
+                <div>🔨 Crafteos: 0</div>
+                <div>🗺️ Locaciones: 1</div>
+                <div>📦 Recursos: 0</div>
+              </div>
+
+              <h2 style="margin-top: 20px;">📈 TUS SKILLS</h2>
+              <div id="skills" style="font-size: 12px;"></div>
+            </div>
+
+            <div class="panel">
+              <h2>🏗️ MEJORAS REFUGIO</h2>
+              <div id="refugioUpgrades" style="font-size: 11px;">
+                <button onclick="upgradeRefugio('torre_vigilancia')" style="width: 100%; margin: 4px 0; padding: 8px; font-size: 11px;">🗼 Torre (30 mat, 5 arm)</button>
+                <button onclick="upgradeRefugio('enfermeria')" style="width: 100%; margin: 4px 0; padding: 8px; font-size: 11px;">⚕️ Enfermería (25 mat, 10 med)</button>
+                <button onclick="upgradeRefugio('taller')" style="width: 100%; margin: 4px 0; padding: 8px; font-size: 11px;">🔧 Taller (35 mat, 3 arm)</button>
+                <button onclick="upgradeRefugio('huerto')" style="width: 100%; margin: 4px 0; padding: 8px; font-size: 11px;">🌱 Huerto (20 mat, 5 com)</button>
+                <button onclick="upgradeRefugio('armeria')" style="width: 100%; margin: 4px 0; padding: 8px; font-size: 11px;">🎯 Armería (40 mat, 15 arm)</button>
+              </div>
+
+              <h2 style="margin-top: 20px;">⏰ TIEMPO</h2>
+              <div id="worldTime" style="font-size: 18px; color: #ffff00;"></div>
+            </div>
           </div>
           
-          <h2>🛡️ DEFENSAS REFUGIO</h2>
-          <div id="defensas" style="font-size: 20px; color: #00ffff; margin: 10px 0;"></div>
-          
-          <h2>📋 QUESTS</h2>
-          <div id="quests" style="margin: 10px 0; font-size: 13px;"></div>
-          
-          <h2>👥 NPCs EN REFUGIO</h2>
-          <div id="npcs"></div>
-          
-          <h2 style="margin-top: 20px;">🧑‍🤝‍🧑 JUGADORES AQUÍ</h2>
-          <div id="playersHere" style="font-size: 12px; min-height: 40px;">
-            <em style="color: #888;">Solo tú</em>
+          <!-- LEADERBOARD -->
+          <div class="container" style="margin-top: 15px;">
+            <div class="panel" style="grid-column: span 3;">
+              <h2>🏆 TABLA DE LÍDERES</h2>
+              <div class="craft-tabs" style="margin-bottom: 10px;">
+                <button class="craft-tab active" onclick="switchLeaderboard('zombies')">🧟 ZOMBIES</button>
+                <button class="craft-tab" onclick="switchLeaderboard('nivel')">📊 NIVEL</button>
+                <button class="craft-tab" onclick="switchLeaderboard('dias')">📅 DÍAS</button>
+                <button class="craft-tab" onclick="switchLeaderboard('prestigio')">👑 PRESTIGIO</button>
+              </div>
+              <div id="leaderboardContent" style="font-size: 11px; max-height: 350px; overflow-y: auto;">
+                <em style="color: #888;">Cargando rankings...</em>
+              </div>
+            </div>
           </div>
-          
-          <h2 style="margin-top: 20px;">🎭 EVENTO</h2>
-          <div id="specialEvent" style="min-height: 60px; font-size: 12px;">
-            <em style="color: #888;">Sin eventos</em>
+        </div>
+
+        <!-- PESTAÑA 5: AVANZADO -->
+        <div id="tab-advanced" class="tab-content">
+          <div class="container">
+            <div class="panel">
+              <h2>🐾 TU MASCOTA</h2>
+              <div id="petPanel" style="font-size: 11px;">
+                <p style="color: #888;">No tienes mascota</p>
+                <button onclick="adoptPet('perro')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 11px;">🐕 Adoptar Perro</button>
+                <button onclick="adoptPet('lobo')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 11px;">🐺 Adoptar Lobo</button>
+                <button onclick="adoptPet('cuervo')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 11px;">🦅 Adoptar Cuervo</button>
+              </div>
+
+              <h2 style="margin-top: 20px;">⚡ HABILIDADES ESPECIALES</h2>
+              <div id="abilitiesPanel" style="font-size: 11px;">
+                <em style="color: #888;">Desbloquea habilidades con tu clase</em>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>⚔️ TU FACCIÓN <span id="factionRank" style="font-size: 12px; color: #ff8800;"></span></h2>
+              <div id="factionPanel" style="font-size: 11px;">
+                <p style="color: #888; margin-bottom: 10px;">Únete a una facción para desbloquear recompensas</p>
+                <button onclick="joinFaction('refugio')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">🏠 Los Refugiados</button>
+                <button onclick="joinFaction('nomadas')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">🚶 Nómadas</button>
+                <button onclick="joinFaction('cientificos')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">🔬 Los Científicos</button>
+                <button onclick="joinFaction('saqueadores')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">💀 Saqueadores</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>🚗 TU VEHÍCULO</h2>
+              <div id="vehiclePanel" style="font-size: 11px;">
+                <p style="color: #888; margin-bottom: 10px;">Construye un vehículo para moverte más rápido y con más seguridad</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <button onclick="craftVehicle('bicicleta')" style="padding: 8px; font-size: 10px;">🚲 Bicicleta<br><small>(10 mat, 5 arm)</small></button>
+                  <button onclick="craftVehicle('moto')" style="padding: 8px; font-size: 10px;">🏍️ Moto<br><small>(30 mat, 20 arm)</small></button>
+                  <button onclick="craftVehicle('auto')" style="padding: 8px; font-size: 10px;">🚗 Auto<br><small>(50 mat, 30 arm)</small></button>
+                  <button onclick="craftVehicle('blindado')" style="padding: 8px; font-size: 10px;">🚐 Blindado<br><small>(100 mat, 60 arm)</small></button>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <h2 style="margin-top: 20px;">🤝 QUEST COOPERATIVA</h2>
-          <div id="questCooperativa" style="min-height: 80px; font-size: 12px; background: #1a3a3a; padding: 10px; border-radius: 5px;">
-            <em style="color: #888;">Sin quest activa</em>
+
+          <div class="container" style="margin-top: 15px;">
+            <div class="panel" style="grid-column: span 3;">
+              <h2>⚔️ ARENA PvP <span id="pvpQueue" style="font-size: 12px; color: #ff0000;"></span></h2>
+              <div id="pvpPanel" style="font-size: 12px;">
+                <p style="color: #888; margin-bottom: 10px;">Enfréntate a otros jugadores en combate directo. Requisitos: 50+ salud</p>
+                <button onclick="enterPvPArena()" style="padding: 15px; font-size: 14px; width: 200px;">🛡️ Entrar a la Arena</button>
+                <div id="pvpMatch" style="margin-top: 15px; display: none; background: #3a1a1a; padding: 15px; border-radius: 5px;">
+                  <h3 id="pvpMatchTitle">COMBATE EN CURSO</h3>
+                  <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+                    <div style="flex: 1;">
+                      <h4 id="pvpPlayer1">Jugador 1</h4>
+                      <div class="stat-bar" style="width: 150px;">
+                        <div id="pvpPlayer1HP" class="stat-fill salud" style="width: 100%;"></div>
+                      </div>
+                    </div>
+                    <div style="align-self: center; font-size: 24px;">⚔️</div>
+                    <div style="flex: 1; text-align: right;">
+                      <h4 id="pvpPlayer2">Jugador 2</h4>
+                      <div class="stat-bar" style="width: 150px; float: right;">
+                        <div id="pvpPlayer2HP" class="stat-fill salud" style="width: 100%;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <button id="pvpAttackBtn" onclick="attackInPvP()" style="width: 100%; padding: 12px; font-size: 16px; background: #880000;">⚔️ ATACAR</button>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <h2 style="margin-top: 20px;">⏰ TIEMPO</h2>
-          <div id="worldTime" style="font-size: 18px; color: #ffff00;"></div>
-          
-          <h2 style="margin-top: 15px;">📊 TUS SKILLS</h2>
-          <div id="skills" style="font-size: 12px;"></div>
         </div>
       </div>
+
     </div>
   </div>
+  
+  <!-- Modal de perfil de jugador -->
+  <div id="profileBackdrop" class="profile-backdrop" style="display: none;" onclick="closeProfile()"></div>
+  <div id="profileModal" class="profile-modal" style="display: none;">
+    <div style="text-align: right; margin-bottom: 10px;">
+      <button onclick="closeProfile()" style="padding: 5px 10px; background: #aa0000;">✖ Cerrar</button>
+    </div>
+    <div id="profileContent"></div>
+  </div>
+  
+  <button id="soundToggle" onclick="toggleSound()" title="Activar/Desactivar sonidos">🔇</button>
 
   <script>
     let ws = null;
     let player = null;
     let world = null;
     let worldLogMessages = []; // Log de eventos del mundo
+    let pingInterval = null;
+    let reconnectTimeout = null;
+    let activeDialogue = null; // Diálogo activo con NPC
+    let dialogueHistory = []; // Historial de conversación
+    let soundEnabled = false; // Sonido desactivado por defecto
+    let audioContext = null;
+    let directMessages = {}; // Almacenar DMs por jugador {playerId: [{from, to, message, timestamp}]}
+    let unreadDMs = 0; // Contador de DMs no leídos
+    let currentDMTarget = null; // Jugador actual en vista de DM
+    let allPlayers = {}; // Caché de todos los jugadores online
+    let currentLeaderboard = 'zombies'; // Leaderboard actual
+    let pendingActions = new Set(); // Prevenir acciones duplicadas
+    let renderCache = {}; // Caché de renders para evitar actualizaciones innecesarias
+    let tabsLoaded = { game: true }; // Tabs ya cargados (game se carga al inicio)
+
+    // Helper para hash simple de objetos
+    function simpleHash(obj) {
+      return JSON.stringify(obj);
+    }
+
+    // Render con caché - solo actualiza si cambió el contenido
+    function cachedRender(key, renderFn, dependencies) {
+      const hash = simpleHash(dependencies);
+      if (renderCache[key] !== hash) {
+        renderFn();
+        renderCache[key] = hash;
+      }
+    }
+
+    // Helper para fetch con manejo de errores robusto
+    async function safeFetch(url, options = {}) {
+      try {
+        const response = await fetch(url, options);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success && data.error) {
+          log(`❌ ${data.error}`, 'warning');
+          playSound('error');
+          return { success: false, error: data.error };
+        }
+        
+        return data;
+      } catch (error) {
+        console.error('Error en fetch:', error);
+        log(`❌ Error de conexión: ${error.message}`, 'warning');
+        playSound('error');
+        return { success: false, error: error.message };
+      }
+    }
 
     // Al cargar, verificar si hay un personaje seleccionado
     window.addEventListener('DOMContentLoaded', () => {
@@ -311,19 +1070,68 @@
     });
 
     function log(message, type = '') {
+      // Determinar ícono según tipo
+      let icon = 'ℹ️';
+      if (type === 'success') icon = '✅';
+      else if (type === 'warning') icon = '⚠️';
+      else if (type === 'combat') icon = '⚔️';
+      else if (type === 'death') icon = '💀';
+      
+      // Reproducir sonido
+      if (type === 'success') playSound('success');
+      else if (type === 'warning') playSound('warning');
+      else if (type === 'combat') playSound('combat');
+      else if (type === 'death') playSound('death');
+      
+      // Log principal
       const logDiv = document.getElementById('log');
       const entry = document.createElement('div');
       entry.className = `log-entry log-${type}`;
-      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      entry.textContent = `${icon} [${new Date().toLocaleTimeString()}] ${message}`;
       logDiv.appendChild(entry);
       logDiv.scrollTop = logDiv.scrollHeight;
+      
+      // Limitar a 50 entradas
+      while (logDiv.children.length > 50) {
+        logDiv.removeChild(logDiv.firstChild);
+      }
+      
+      // También agregar al log de eventos
+      const logDiv2 = document.getElementById('log2');
+      if (logDiv2) {
+        const entry2 = document.createElement('div');
+        entry2.className = `log-entry log-${type}`;
+        entry2.textContent = `${icon} [${new Date().toLocaleTimeString()}] ${message}`;
+        logDiv2.appendChild(entry2);
+        logDiv2.scrollTop = logDiv2.scrollHeight;
+        
+        while (logDiv2.children.length > 50) {
+          logDiv2.removeChild(logDiv2.firstChild);
+        }
+      }
     }
     
     function worldLog(message, category = '') {
+      // Íconos por categoría
+      const icons = {
+        player: '🧍',
+        zombie: '🧟',
+        npc: '👤',
+        event: '🎭',
+        horde: '🚨',
+        trade: '💱',
+        faction: '⚔️',
+        pet: '🐾',
+        vehicle: '🚗',
+        pvp: '⚔️',
+        special: '⭐'
+      };
+      const icon = icons[category] || '🌍';
+      
       const logDiv = document.getElementById('worldLog');
       const entry = document.createElement('div');
       entry.className = `log-entry log-${category}`;
-      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      entry.textContent = `${icon} [${new Date().toLocaleTimeString()}] ${message}`;
       logDiv.appendChild(entry);
       logDiv.scrollTop = logDiv.scrollHeight;
       
@@ -331,6 +1139,335 @@
       while (logDiv.children.length > 20) {
         logDiv.removeChild(logDiv.firstChild);
       }
+    }
+
+    // ====================================
+    // SISTEMA DE SONIDO
+    // ====================================
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundToggle');
+      btn.textContent = soundEnabled ? '🔊' : '🔇';
+      btn.title = soundEnabled ? 'Desactivar sonidos' : 'Activar sonidos';
+      
+      if (soundEnabled && !audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      if (soundEnabled) {
+        playSound('success');
+      }
+    }
+    
+    function playSound(type) {
+      if (!soundEnabled || !audioContext) return;
+      
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Diferentes tonos según tipo
+      switch(type) {
+        case 'success':
+          oscillator.frequency.value = 800;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          break;
+        case 'error':
+          oscillator.frequency.value = 200;
+          oscillator.type = 'sawtooth';
+          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+          break;
+        case 'warning':
+          oscillator.frequency.value = 400;
+          oscillator.type = 'triangle';
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          break;
+        case 'combat':
+          oscillator.frequency.value = 150;
+          oscillator.type = 'square';
+          gainNode.gain.setValueAtTime(0.12, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          break;
+        case 'levelup':
+          // Sonido ascendente épico
+          oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.3);
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.stop(audioContext.currentTime + 0.3);
+          return;
+        case 'loot':
+          // Sonido de pickup
+          oscillator.frequency.value = 1000;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+          oscillator.stop(audioContext.currentTime + 0.08);
+          return;
+        case 'craft':
+          // Sonido de martillo
+          oscillator.frequency.value = 300;
+          oscillator.type = 'square';
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+          oscillator.stop(audioContext.currentTime + 0.05);
+          return;
+        case 'move':
+          // Sonido sutil de paso
+          oscillator.frequency.value = 250;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.06);
+          oscillator.stop(audioContext.currentTime + 0.06);
+          return;
+        case 'notification':
+          // Ping suave
+          oscillator.frequency.value = 600;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
+          oscillator.stop(audioContext.currentTime + 0.12);
+          return;
+        case 'death':
+          // Sonido grave de muerte
+          oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.4);
+          oscillator.type = 'sawtooth';
+          gainNode.gain.setValueAtTime(0.18, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+          oscillator.stop(audioContext.currentTime + 0.4);
+          return;
+        case 'achievement':
+          // Fanfarria corta
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.08);
+          oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.16);
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.12, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+          oscillator.stop(audioContext.currentTime + 0.25);
+          return;
+        case 'click':
+          // Click UI
+          oscillator.frequency.value = 500;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.06, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
+          oscillator.stop(audioContext.currentTime + 0.03);
+          return;
+      }
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.2);
+    }
+    
+    // ====================================
+    // TABS DE CRAFTEO
+    // ====================================
+    function switchCraftTab(tabName) {
+      // Desactivar todos los tabs
+      document.querySelectorAll('.craft-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.craft-section').forEach(section => section.classList.remove('active'));
+      
+      // Activar el seleccionado
+      event.target.classList.add('active');
+      document.getElementById(`craft-${tabName}`).classList.add('active');
+      
+      playSound('success');
+    }
+    
+    // ====================================
+    // REFUGIO VISUAL DINÁMICO
+    // ====================================
+    function renderRefugioVisual() {
+      if (!world || !world.locations || !world.locations.refugio) return;
+      
+      const refugio = world.locations.refugio;
+      const defensas = refugio.defensas || 0;
+      const mejoras = refugio.mejoras || {};
+      
+      let visual = '🏘️'; // Base: edificio básico
+      
+      // Añadir elementos según mejoras
+      if (mejoras.torre_vigilancia && mejoras.torre_vigilancia.nivel > 0) {
+        visual = '🏯' + visual; // Torre
+      }
+      if (mejoras.enfermeria && mejoras.enfermeria.nivel > 0) {
+        visual += '⚕️'; // Cruz médica
+      }
+      if (mejoras.taller && mejoras.taller.nivel > 0) {
+        visual += '🔧'; // Herramientas
+      }
+      if (mejoras.armeria && mejoras.armeria.nivel > 0) {
+        visual += '🛡️'; // Escudo
+      }
+      if (mejoras.huerto && mejoras.huerto.nivel > 0) {
+        visual += '🌿'; // Planta
+      }
+      
+      // Estado según defensas
+      let estadoText = '';
+      let color = '#00ff00';
+      if (defensas < 20) {
+        estadoText = '⚠️ VULNERABLE';
+        color = '#ff0000';
+      } else if (defensas < 50) {
+        estadoText = '⚙️ FORTIFICADO';
+        color = '#ffaa00';
+      } else if (defensas < 100) {
+        estadoText = '🛡️ PROTEGIDO';
+        color = '#00ff00';
+      } else {
+        estadoText = '🏯 FORTALEZA';
+        color = '#00ffff';
+      }
+      
+      const html = `
+        <div style="text-align: center;">
+          <div style="font-size: 48px; margin: 10px 0;">${visual}</div>
+          <div style="font-size: 12px; color: ${color}; font-weight: bold;">${estadoText}</div>
+        </div>
+      `;
+      
+      document.getElementById('refugioVisual').innerHTML = html;
+    }
+    
+    // ====================================
+    // SISTEMA DE PESTAÑAS
+    // ====================================
+    function switchTab(tabName) {
+      // Ocultar todos los contenidos
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => content.classList.remove('active'));
+      
+      // Desactivar todos los botones
+      const buttons = document.querySelectorAll('.tab-button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      
+      // Activar la pestaña seleccionada
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+      
+      // Sonido de click
+      playSound('click');
+      
+      // Limpiar badge cuando se abre la pestaña
+      if (tabName === 'events') {
+        hideBadge('events');
+      } else if (tabName === 'social') {
+        hideBadge('social');
+      }
+      
+      // Lazy loading: cargar contenido solo la primera vez
+      if (!tabsLoaded[tabName]) {
+        tabsLoaded[tabName] = true;
+        switch(tabName) {
+          case 'crafting':
+            renderCrafting();
+            break;
+          case 'quests':
+            renderQuests();
+            break;
+          case 'social':
+            renderOnlinePlayers([]);
+            renderChat();
+            break;
+          case 'progression':
+            loadDefaultLeaderboard();
+            renderAchievements();
+            break;
+          case 'events':
+            renderWorldEvents();
+            renderNarrativeHistory();
+            break;
+        }
+      } else if (tabName === 'progression') {
+        // Siempre actualizar leaderboard al abrir
+        loadDefaultLeaderboard();
+      }
+    }
+
+    function showBadge(tab) {
+      const badge = document.getElementById(`badge-${tab}`);
+      if (badge) {
+        badge.style.display = 'flex';
+      }
+    }
+
+    function hideBadge(tab) {
+      const badge = document.getElementById(`badge-${tab}`);
+      if (badge) {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Acciones rápidas desde la pestaña principal
+    function quickAction(action) {
+      switch(action) {
+        case 'scavenge':
+          showActionFeedback('🔍 Buscando recursos...');
+          scavenge();
+          break;
+        case 'attack':
+          showActionFeedback('⚔️ Iniciando combate...', 'danger');
+          startCombat();
+          break;
+        case 'rest':
+          rest();
+          break;
+        case 'eat':
+          eat();
+          break;
+      }
+    }
+    
+    function showActionFeedback(text, type = 'success') {
+      let feedbackEl = document.getElementById('actionFeedback');
+      if (!feedbackEl) {
+        feedbackEl = document.createElement('div');
+        feedbackEl.id = 'actionFeedback';
+        document.body.appendChild(feedbackEl);
+      }
+      
+      feedbackEl.textContent = text;
+      feedbackEl.style.background = type === 'danger' ? 'rgba(255, 0, 0, 0.95)' : 'rgba(0, 255, 0, 0.95)';
+      feedbackEl.style.color = type === 'danger' ? '#fff' : '#000';
+      feedbackEl.style.display = 'block';
+      
+      setTimeout(() => {
+        feedbackEl.style.display = 'none';
+      }, 800);
+    }
+
+    function rest() {
+      if (!player) return;
+      
+      player.salud = Math.min(100, player.salud + 10);
+      player.hambre = Math.max(0, player.hambre - 5);
+      
+      log('😴 Descansaste un momento. +10 salud', 'success');
+      renderGame();
+    }
+
+    function eat() {
+      if (!player || !player.inventario.comida || player.inventario.comida <= 0) {
+        showNotification('No tienes comida', 'warning');
+        return;
+      }
+      
+      player.inventario.comida--;
+      player.hambre = Math.min(100, player.hambre + 40);
+      player.salud = Math.min(100, player.salud + 5);
+      
+      log('🍖 Comiste. +40 hambre, +5 salud', 'success');
+      renderGame();
     }
 
     async function createPlayer() {
@@ -341,13 +1478,11 @@
         return;
       }
       
-      const response = await fetch('/api/player/create', {
+      const data = await safeFetch('/api/player/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre })
       });
-      
-      const data = await response.json();
       
       if (data.success) {
         player = data.player;
@@ -358,13 +1493,46 @@
     }
 
     function connectWebSocket() {
+      // Limpiar intervalo anterior si existe
+      if (pingInterval) clearInterval(pingInterval);
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      
+      // Exponential backoff para reconexión
+      if (!window.reconnectAttempts) window.reconnectAttempts = 0;
+      if (!window.maxReconnectAttempts) window.maxReconnectAttempts = 5;
+      
       // Detectar si usar ws:// o wss:// según el protocolo de la página
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       ws = new WebSocket(`${protocol}//${window.location.host}`);
       
       ws.onopen = () => {
-        log('Conectado al servidor', 'success');
+        log('✅ Conectado al servidor', 'success');
+        playSound('success');
+        window.reconnectAttempts = 0; // Reset contador
+        
         ws.send(JSON.stringify({ type: 'login', playerId: player.id }));
+        
+        // Solicitar estado completo del mundo
+        ws.send(JSON.stringify({ type: 'getWorld' }));
+        
+        // Actualizar indicador de conexión
+        const statusEl = document.getElementById('connectionStatus');
+        if (statusEl) {
+          statusEl.className = 'connection-status connected';
+          statusEl.innerHTML = '🟢 Conectado';
+        }
+        
+        // Mostrar mensaje de bienvenida con comandos
+        setTimeout(() => {
+          addSystemMessage('¡Bienvenido! Escribe /help en el chat para ver comandos disponibles.\nAtajos de teclado: S=Buscar, C=Combate, T=Comerciar, H=Hablar');
+        }, 1000);
+        
+        // Iniciar ping cada 30 segundos para mantener conexión activa
+        pingInterval = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, 30000);
       };
       
       ws.onmessage = (event) => {
@@ -374,15 +1542,197 @@
       
       ws.onclose = () => {
         log('Desconectado del servidor', 'warning');
+        if (pingInterval) clearInterval(pingInterval);
+        
+        // Actualizar indicador de conexión
+        const statusEl = document.getElementById('connectionStatus');
+        if (statusEl) {
+          statusEl.className = 'connection-status disconnected pulse';
+          statusEl.innerHTML = '🔴 Desconectado';
+        }
+        
+        // Intentar reconectar con exponential backoff
+        if (window.reconnectAttempts < window.maxReconnectAttempts) {
+          window.reconnectAttempts++;
+          const delay = Math.min(1000 * Math.pow(2, window.reconnectAttempts - 1), 16000);
+          log(`Reconectando en ${delay/1000}s... (intento ${window.reconnectAttempts}/${window.maxReconnectAttempts})`, 'warning');
+          
+          reconnectTimeout = setTimeout(() => {
+            connectWebSocket();
+          }, delay);
+        } else {
+          log('❌ No se pudo reconectar. Recarga la página.', 'warning');
+          if (statusEl) statusEl.innerHTML = '🔴 Sin conexión';
+        }
+      };
+      
+      ws.onerror = (error) => {
+        log('Error de conexión', 'warning');
       };
     }
 
+    // ====================================
+    // WEBSOCKET HANDLERS (Organizado por tipo)
+    // ====================================
+    const messageHandlers = {
+      'world:state': (msg) => {
+        world = msg.world;
+        console.log('📦 Mundo recibido:', world);
+        if (world.players && world.players[player.id]) {
+          player = world.players[player.id];
+        }
+        renderGame();
+      },
+      
+      'moved': (msg) => {
+        log(`Te moviste a: ${msg.location.nombre}`, 'success');
+        player.locacion = msg.location.id;
+        playSound('move');
+        renderGame();
+      },
+      
+      'scavenge:result': (msg) => {
+        const items = Object.entries(msg.found).map(([k,v]) => `${k}:${v}`).join(', ');
+        log(`Encontraste: ${items || 'nada'}`, 'success');
+        if (msg.inventario) player.inventario = msg.inventario;
+        if (items) playSound('loot');
+        renderGame();
+      },
+      
+      'combat': (msg) => {
+        log(msg.message, 'combat');
+        player.salud = msg.salud;
+        renderGame();
+      },
+      
+      'combat:result': (msg) => {
+        let combatMsg = `⚔️ Eliminaste ${msg.killed} zombies`;
+        if (msg.critico) combatMsg += ' ¡CRÍTICO!';
+        if (msg.falloSigilo) combatMsg = '🚫 Fallo de sigilo! Te detectaron y te hirieron.';
+        const lootItems = Object.entries(msg.loot || {});
+        if (lootItems.length > 0) {
+          combatMsg += ' | Loot: ' + lootItems.map(([k,v]) => `${k}:${v}`).join(', ');
+        }
+        log(`${combatMsg}. Quedan: ${msg.remaining}`, 'combat');
+        player.inventario = msg.inventario;
+        renderGame();
+      },
+      
+      'craft:success': (msg) => {
+        log(`🔨 Crafteaste: ${msg.item}`, 'success');
+        if (msg.defensas && world.locations?.refugio) {
+          world.locations.refugio.defensas = msg.defensas;
+        }
+        if (msg.inventario) player.inventario = msg.inventario;
+        playSound('craft');
+        renderGame();
+      },
+      
+      'level:up': (msg) => {
+        player.nivel = msg.nivel;
+        player.xpParaSiguienteNivel = msg.xpMax;
+        player.xp = 0;
+        playSound('levelup');
+        showNotification(`🎉 ¡NIVEL ${msg.nivel}!`, 'success');
+        renderGame();
+      },
+      
+      'xp:gained': (msg) => {
+        log(`+${msg.amount} XP (${msg.xp}/${msg.xpMax})`, 'success');
+        player.xp = msg.xp;
+        player.xpParaSiguienteNivel = msg.xpMax;
+        renderGame();
+      },
+      
+      'world:event': (msg) => {
+        worldLog(msg.message, msg.category);
+        const eventsTab = document.getElementById('tab-events');
+        if (eventsTab && !eventsTab.classList.contains('active')) {
+          showBadge('events');
+        }
+      },
+      
+      'player:joined': (msg) => {
+        worldLog(`👤 ${msg.nombre} se unió`, 'success');
+        renderGame();
+      },
+      
+      'player:left': (msg) => {
+        worldLog(`👤 ${msg.nombre} se desconectó`, 'warning');
+      },
+      
+      'players:list': (msg) => {
+        renderOnlinePlayers(msg.players);
+        updateTradePlayerSelect(msg.players);
+      },
+      
+      'chat:message': (msg) => {
+        addChatMessage(msg);
+        if (msg.playerId !== player.id) {
+          const socialTab = document.getElementById('tab-social');
+          if (socialTab && !socialTab.classList.contains('active')) {
+            showBadge('social');
+          }
+        }
+      },
+      
+      'achievement:unlocked': (msg) => {
+        handleAchievementUnlocked(msg.achievement);
+        if (!player.achievements) player.achievements = {};
+        player.achievements[msg.achievement.id] = { desbloqueado: true, fecha: Date.now() };
+        playSound('achievement');
+        renderAchievements();
+      },
+      
+      'mission:completed': (msg) => {
+        showNotification(`✅ Misión: ${msg.mission?.descripcion}`, 'success');
+        if (msg.inventario) player.inventario = msg.inventario;
+        if (world.activeMissions) {
+          const mission = world.activeMissions.find(m => m.id === msg.mission?.id);
+          if (mission && !mission.completedBy.includes(player.id)) {
+            mission.completedBy.push(player.id);
+          }
+        }
+        renderGame();
+      },
+      
+      'error': (msg) => {
+        log(`ERROR: ${msg.error}`, 'warning');
+      }
+    };
+
     function handleMessage(msg) {
+      const handler = messageHandlers[msg.type];
+      if (handler) {
+        handler(msg);
+      } else {
+        // Fallback para mensajes no migrados aún
+        handleMessageLegacy(msg);
+      }
+    }
+
+    function handleMessageLegacy(msg) {
       switch(msg.type) {
         case 'world:state':
           world = msg.world;
+          console.log('📦 Mundo recibido:', world);
           if (world.players && world.players[player.id]) {
             player = world.players[player.id];
+          }
+          renderGame();
+          break;
+        
+        case 'mission:completed':
+          log(`✅ Misión completada! Recompensa: ${Object.entries(msg.recompensa).map(([k,v]) => `${k}:${v}`).join(', ')}`, 'success');
+          if (msg.inventario) {
+            player.inventario = msg.inventario;
+          }
+          // Actualizar el mundo local para reflejar la misión completada
+          if (world.activeMissions) {
+            const mission = world.activeMissions.find(m => m.id === msg.mission.id);
+            if (mission && !mission.completedBy.includes(player.id)) {
+              mission.completedBy.push(player.id);
+            }
           }
           renderGame();
           break;
@@ -390,6 +1740,7 @@
         case 'moved':
           log(`Te moviste a: ${msg.location.nombre}`, 'success');
           player.locacion = msg.location.id;
+          playSound('move');
           renderGame();
           break;
           
@@ -399,6 +1750,7 @@
           if (msg.inventario) {
             player.inventario = msg.inventario;
           }
+          if (items) playSound('loot');
           renderGame();
           break;
           
@@ -419,6 +1771,23 @@
           
         case 'dialogue':
           log(`${msg.npc}: "${msg.text}"`, '');
+          
+          // Actualizar panel de diálogo interactivo
+          activeDialogue = {
+            npcId: msg.npcId,
+            npcName: msg.npc,
+            text: msg.text,
+            options: msg.options || []
+          };
+          
+          dialogueHistory.push({
+            speaker: msg.npc,
+            text: msg.text,
+            timestamp: Date.now()
+          });
+          
+          renderInteractiveDialogue();
+          showBadge('events');
           break;
           
         case 'npc:died':
@@ -467,6 +1836,7 @@
           if (msg.inventario) {
             player.inventario = msg.inventario;
           }
+          playSound('craft');
           renderGame();
           break;
           
@@ -512,11 +1882,25 @@
           
         case 'world:event':
           worldLog(msg.message, msg.category);
+          
+          // Mostrar badge en pestaña de eventos si no está activa
+          const eventsTab = document.getElementById('tab-events');
+          if (eventsTab && !eventsTab.classList.contains('active')) {
+            showBadge('events');
+          }
           break;
           
         case 'player:joined':
           worldLog(`👤 ${msg.nombre} se unió`, 'success');
           renderGame();
+          break;
+          
+        case 'player:left':
+          worldLog(`👤 ${msg.nombre} se desconectó`, 'warning');
+          break;
+
+        case 'players:list':
+          renderOnlinePlayers(msg.players);
           break;
           
         case 'player:moved':
@@ -541,6 +1925,8 @@
           player.nivel = msg.nivel;
           player.xpParaSiguienteNivel = msg.xpMax;
           player.xp = 0;
+          playSound('levelup');
+          showNotification(`🎉 ¡NIVEL ${msg.nivel}!`, 'success');
           renderGame();
           break;
           
@@ -575,6 +1961,179 @@
           
         case 'chat:message':
           addChatMessage(msg);
+          
+          // Mostrar badge en pestaña social si no está activa y no es tu mensaje
+          if (msg.playerId !== player.id) {
+            const socialTab = document.getElementById('tab-social');
+            if (socialTab && !socialTab.classList.contains('active')) {
+              showBadge('social');
+            }
+          }
+          break;
+          
+        case 'chat:system':
+          addSystemMessage(msg.mensaje);
+          break;
+        
+        // ====================================
+        // MENSAJES PRIVADOS
+        // ====================================
+        case 'dm:received':
+          // Agregar a log local
+          if (!directMessages[msg.from]) directMessages[msg.from] = [];
+          directMessages[msg.from].push({
+            from: msg.from,
+            to: player.id,
+            message: msg.message,
+            timestamp: Date.now(),
+            sent: false
+          });
+          
+          // Incrementar contador de no leídos
+          unreadDMs++;
+          updateDMBadge();
+          
+          // Notificación
+          playSound('warning');
+          log(`💌 Mensaje privado de ${allPlayers[msg.from] || 'Desconocido'}`, 'warning');
+          
+          // Si está viendo DMs de ese jugador, actualizar
+          if (currentDMTarget === msg.from) {
+            renderDMs();
+            unreadDMs--;
+            updateDMBadge();
+          }
+          
+          // Badge en tab social
+          const socialTab = document.getElementById('tab-social');
+          if (socialTab && !socialTab.classList.contains('active')) {
+            showBadge('social');
+          }
+          break;
+        
+        case 'dm:sent':
+          playSound('success');
+          break;
+          
+        case 'achievement:unlocked':
+          handleAchievementUnlocked(msg.achievement);
+          if (!player.achievements) player.achievements = {};
+          player.achievements[msg.achievement.id] = { desbloqueado: true, fecha: Date.now() };
+          playSound('achievement');
+          renderAchievements();
+          break;
+          
+        case 'players:list':
+          renderOnlinePlayers(msg.players);
+          updateTradePlayerSelect(msg.players);
+          break;
+          
+        case 'mission:completed':
+          showNotification(`✅ Misión completada: ${msg.mission.descripcion}`, 'success');
+          player.inventario = msg.inventario;
+          renderGame();
+          break;
+          
+        case 'pet:updated':
+          player.mascota = msg.mascota;
+          player.inventario = msg.inventario;
+          renderPet();
+          break;
+        
+        case 'pet:adopted':
+          player.mascota = msg.mascota;
+          showNotification(`🐾 Adoptaste ${msg.mascota.nombre}!`, 'success');
+          renderPet();
+          break;
+        
+        case 'faction:joined':
+          player.faccion = msg.faccion;
+          player.factionRep = msg.reputation;
+          showNotification(`⚔️ Te uniste a ${msg.faccion.nombre}!`, 'success');
+          renderFaction();
+          break;
+        
+        case 'faction:reputation':
+          player.factionRep = msg.reputation;
+          renderFaction();
+          break;
+        
+        case 'vehicle:created':
+          player.vehiculo = msg.vehiculo;
+          player.inventario = msg.inventario;
+          showNotification(`🚗 Construiste ${msg.vehiculo.nombre}!`, 'success');
+          renderVehicle();
+          break;
+          
+        case 'ability:result':
+          if (msg.success) {
+            showNotification(`⚡ ${msg.ability.nombre} activada!`, 'success');
+            renderGame();
+          } else {
+            showNotification(msg.error, 'warning');
+          }
+          break;
+          
+        case 'reputation:updated':
+          showNotification(`Reputación con NPC: ${msg.level.nombre}`, 'info');
+          break;
+          
+        case 'pvp:match:start':
+          currentPvPMatch = msg.matchId;
+          document.getElementById('pvpMatch').style.display = 'block';
+          document.getElementById('pvpPlayer1').textContent = msg.player1.nombre;
+          document.getElementById('pvpPlayer2').textContent = msg.player2.nombre;
+          document.getElementById('pvpPlayer1HP').style.width = '100%';
+          document.getElementById('pvpPlayer2HP').style.width = '100%';
+          showNotification(`⚔️ Combate PvP iniciado!`, 'info');
+          break;
+          
+        case 'pvp:attack':
+          const isP1 = msg.attacker === player.nombre;
+          const targetHP = msg.defenderSalud;
+          const maxHP = 100;
+          const hpPercent = (targetHP / maxHP) * 100;
+          
+          if (isP1) {
+            document.getElementById('pvpPlayer2HP').style.width = hpPercent + '%';
+          } else {
+            document.getElementById('pvpPlayer1HP').style.width = hpPercent + '%';
+          }
+          
+          log(`⚔️ ${msg.attacker} atacó a ${msg.defender} por ${msg.damage} de daño`, 'combat');
+          break;
+          
+        case 'pvp:match:end':
+          const won = msg.winner === player.nombre;
+          showNotification(won ? '🏆 ¡VICTORIA!' : '💀 Derrota', won ? 'success' : 'warning');
+          document.getElementById('pvpMatch').style.display = 'none';
+          currentPvPMatch = null;
+          renderGame();
+          break;
+        
+        // ====================================
+        // EVENTOS NARRATIVOS
+        // ====================================
+        case 'narrative:event':
+          world.activeNarrativeEvent = msg.event;
+          log(`📖 ${msg.event.nombre} (Parte ${msg.event.parte})`, 'warning');
+          playSound('notification');
+          showBadge('events'); // Notificar en tab EVENTOS
+          renderGame();
+          break;
+        
+        case 'narrative:completed':
+          log(msg.resultado, 'success');
+          player.inventario = msg.inventario;
+          if (msg.defensas) {
+            world.locations.refugio.defensas = msg.defensas;
+          }
+          renderGame();
+          break;
+        
+        case 'narrative:failed':
+          log(msg.message, 'warning');
+          playSound('error');
           break;
       }
     }
@@ -592,6 +2151,22 @@
         <div style="font-size: 10px; color: #888;">${time}</div>
         <div><span style="color: ${nameColor}; font-weight: bold;">${msg.avatar} ${msg.nombre}:</span> ${msg.mensaje}</div>
       `;
+      
+      chatLog.appendChild(entry);
+      chatLog.scrollTop = chatLog.scrollHeight;
+      
+      // Mantener solo últimos 30 mensajes
+      while (chatLog.children.length > 30) {
+        chatLog.removeChild(chatLog.firstChild);
+      }
+    }
+
+    function addSystemMessage(mensaje) {
+      const chatLog = document.getElementById('chatLog');
+      const entry = document.createElement('div');
+      entry.style.cssText = 'margin: 5px 0; padding: 8px; background: #1a3a1a; border-left: 3px solid #00ff00; border-radius: 3px; white-space: pre-line;';
+      
+      entry.innerHTML = `<span style="color: #00ff00; font-weight: bold;">🖥️ SISTEMA:</span> ${mensaje}`;
       
       chatLog.appendChild(entry);
       chatLog.scrollTop = chatLog.scrollHeight;
@@ -620,6 +2195,344 @@
       input.value = '';
     }
     
+    // ====================================
+    // MENSAJES PRIVADOS (DMs)
+    // ====================================
+    function sendDM() {
+      const input = document.getElementById('dmInput');
+      const targetSelect = document.getElementById('dmTargetSelect');
+      const mensaje = input.value.trim();
+      const targetId = targetSelect.value;
+      
+      if (!mensaje || !targetId) {
+        showActionFeedback('Selecciona un jugador y escribe un mensaje', 'danger');
+        return;
+      }
+      
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No conectado al servidor', 'warning');
+        return;
+      }
+      
+      ws.send(JSON.stringify({
+        type: 'dm',
+        targetId,
+        mensaje
+      }));
+      
+      // Agregar a log local
+      if (!directMessages[targetId]) directMessages[targetId] = [];
+      directMessages[targetId].push({
+        from: player.id,
+        to: targetId,
+        message: mensaje,
+        timestamp: Date.now(),
+        sent: true
+      });
+      
+      currentDMTarget = targetId;
+      renderDMs();
+      input.value = '';
+      playSound('success');
+    }
+    
+    function renderDMs() {
+      const dmLog = document.getElementById('dmLog');
+      if (!currentDMTarget || !directMessages[currentDMTarget]) {
+        dmLog.innerHTML = '<em style="color: #888;">No hay mensajes con este jugador</em>';
+        return;
+      }
+      
+      const messages = directMessages[currentDMTarget];
+      const html = messages.map(dm => {
+        const isSent = dm.from === player.id;
+        const time = new Date(dm.timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        const senderName = isSent ? 'Tú' : (allPlayers[dm.from] || 'Desconocido');
+        
+        return `
+          <div class="dm-message ${isSent ? 'dm-sent' : 'dm-received'}">
+            <div style="font-weight: bold; color: ${isSent ? '#00ff00' : '#ff8800'}; margin-bottom: 3px;">
+              ${senderName} <span style="font-size: 9px; color: #888; font-weight: normal;">${time}</span>
+            </div>
+            <div>${dm.message}</div>
+          </div>
+        `;
+      }).join('');
+      
+      dmLog.innerHTML = html;
+      dmLog.scrollTop = dmLog.scrollHeight;
+    }
+    
+    function switchChatTab(tab) {
+      // Cambiar tabs
+      document.querySelectorAll('.craft-tab').forEach(t => {
+        if (t.onclick && t.onclick.toString().includes('switchChatTab')) {
+          t.classList.remove('active');
+        }
+      });
+      
+      event.target.classList.add('active');
+      
+      // Cambiar secciones
+      document.getElementById('chat-global').classList.remove('active');
+      document.getElementById('chat-dms').classList.remove('active');
+      
+      if (tab === 'global') {
+        document.getElementById('chat-global').classList.add('active');
+      } else if (tab === 'dms') {
+        document.getElementById('chat-dms').classList.add('active');
+        unreadDMs = 0;
+        updateDMBadge();
+      }
+      
+      playSound('success');
+    }
+    
+    function updateDMBadge() {
+      const badge = document.getElementById('dmBadge');
+      if (unreadDMs > 0) {
+        badge.style.display = 'block';
+        badge.textContent = unreadDMs;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    
+    // ====================================
+    // INSPECCIONAR JUGADOR
+    // ====================================
+    function inspectPlayer(playerId) {
+      // Pedir datos completos del jugador al servidor
+      fetch(`/api/player/${playerId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) {
+            showActionFeedback(data.error, 'danger');
+            return;
+          }
+          showPlayerProfile(data.player);
+        })
+        .catch(err => {
+          console.error('Error al inspeccionar:', err);
+          showActionFeedback('Error al cargar perfil', 'danger');
+        });
+      
+      playSound('success');
+    }
+    
+    function showPlayerProfile(target) {
+      const modal = document.getElementById('profileModal');
+      const backdrop = document.getElementById('profileBackdrop');
+      const content = document.getElementById('profileContent');
+      
+      // Calcular título/rango
+      let rankBadge = '';
+      let titleBadge = '';
+      
+      const stats = target.stats || {};
+      const zombies = stats.zombies_matados || 0;
+      const dias = stats.dias_sobrevividos || 0;
+      
+      if (zombies > 100) rankBadge = '💀';
+      else if (zombies > 50) rankBadge = '⚔️';
+      else if (zombies > 20) rankBadge = '🔪';
+      
+      if (dias > 30) titleBadge = '<span class="title-badge">🏆 VETERANO</span>';
+      else if (dias > 15) titleBadge = '<span class="title-badge">⭐ SUPERVIVIENTE</span>';
+      else if (dias > 7) titleBadge = '<span class="title-badge">🎖️ RESISTENTE</span>';
+      
+      // Calcular "prestigio" (score combinado)
+      const prestigio = (zombies * 10) + (dias * 100) + (target.nivel * 50) + (stats.items_crafteados || 0);
+      
+      // Comparación con tus stats
+      const myZombies = player.stats?.zombies_matados || 0;
+      const myNivel = player.nivel || 1;
+      const myDias = player.stats?.dias_sobrevividos || 0;
+      
+      const html = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="font-size: 48px; margin: 10px 0;">${rankBadge || '👤'}</div>
+          <h2 style="color: #00ff00; margin: 5px 0;">${target.nombre}</h2>
+          ${titleBadge}
+          <div style="font-size: 12px; color: #888; margin-top: 5px;">Prestigio: ${prestigio.toLocaleString()}</div>
+        </div>
+        
+        <div style="border-top: 2px solid #00ff00; padding-top: 15px; margin-top: 15px;">
+          <h3 style="margin-bottom: 10px;">📊 ESTADÍSTICAS</h3>
+          
+          <div class="stat-comparison">
+            <span>Nivel:</span>
+            <span class="${target.nivel > myNivel ? 'stat-better' : target.nivel < myNivel ? 'stat-worse' : ''}">${target.nivel}</span>
+          </div>
+          
+          <div class="stat-comparison">
+            <span>🧟 Zombies eliminados:</span>
+            <span class="${zombies > myZombies ? 'stat-better' : zombies < myZombies ? 'stat-worse' : ''}">${zombies}</span>
+          </div>
+          
+          <div class="stat-comparison">
+            <span>📅 Días sobrevividos:</span>
+            <span class="${dias > myDias ? 'stat-better' : dias < myDias ? 'stat-worse' : ''}">${dias}</span>
+          </div>
+          
+          <div class="stat-comparison">
+            <span>🔨 Items crafteados:</span>
+            <span>${stats.items_crafteados || 0}</span>
+          </div>
+          
+          <div class="stat-comparison">
+            <span>🗺️ Locaciones visitadas:</span>
+            <span>${stats.locaciones_visitadas || 1}</span>
+          </div>
+        </div>
+        
+        <div style="border-top: 2px solid #00ff00; padding-top: 15px; margin-top: 15px;">
+          <h3 style="margin-bottom: 10px;">🎒 INVENTARIO</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 11px;">
+            <div>🍖 Comida: ${target.inventario?.comida || 0}</div>
+            <div>💊 Medicinas: ${target.inventario?.medicinas || 0}</div>
+            <div>🔩 Materiales: ${target.inventario?.materiales || 0}</div>
+            <div>🔫 Armas: ${target.inventario?.armas || 0}</div>
+          </div>
+        </div>
+        
+        ${target.mascota ? `
+        <div style="border-top: 2px solid #00ff00; padding-top: 15px; margin-top: 15px;">
+          <h3 style="margin-bottom: 10px;">🐾 MASCOTA</h3>
+          <div style="text-align: center;">
+            <div style="font-size: 32px;">${target.mascota.icono || '🐕'}</div>
+            <div style="color: #00ff00;">${target.mascota.nombre}</div>
+            <div style="font-size: 11px; color: #888;">Nivel ${target.mascota.nivel || 1}</div>
+          </div>
+        </div>
+        ` : ''}
+        
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+          <button onclick="sendDMTo('${target.id}', '${target.nombre}')" style="flex: 1; padding: 10px;">💌 Mensaje Privado</button>
+          <button onclick="closeProfile()" style="padding: 10px;">Cerrar</button>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+      modal.style.display = 'block';
+      backdrop.style.display = 'block';
+    }
+    
+    function closeProfile() {
+      document.getElementById('profileModal').style.display = 'none';
+      document.getElementById('profileBackdrop').style.display = 'none';
+    }
+    
+    function sendDMTo(playerId, playerName) {
+      closeProfile();
+      switchTab('social');
+      switchChatTab('dms');
+      
+      // Seleccionar jugador en el dropdown
+      const select = document.getElementById('dmTargetSelect');
+      select.value = playerId;
+      currentDMTarget = playerId;
+      renderDMs();
+      
+      // Focus en input
+      document.getElementById('dmInput').focus();
+    }
+    
+    // ====================================
+    // LEADERBOARD
+    // ====================================
+    function switchLeaderboard(category) {
+      currentLeaderboard = category;
+      
+      // Cambiar tabs
+      document.querySelectorAll('.craft-tab').forEach(t => {
+        if (t.onclick && t.onclick.toString().includes('switchLeaderboard')) {
+          t.classList.remove('active');
+        }
+      });
+      
+      event.target.classList.add('active');
+      
+      // Pedir datos al servidor
+      fetch(`/api/leaderboard/${category}`)
+        .then(r => r.json())
+        .then(data => {
+          renderLeaderboard(data.rankings, category);
+        })
+        .catch(err => {
+          console.error('Error al cargar leaderboard:', err);
+          document.getElementById('leaderboardContent').innerHTML = '<em style="color: #ff8888;">Error al cargar rankings</em>';
+        });
+      
+      playSound('success');
+    }
+    
+    function renderLeaderboard(rankings, category) {
+      const container = document.getElementById('leaderboardContent');
+      
+      if (!rankings || rankings.length === 0) {
+        container.innerHTML = '<em style="color: #888;">No hay datos disponibles</em>';
+        return;
+      }
+      
+      let categoryLabel = '';
+      let valueKey = '';
+      
+      switch(category) {
+        case 'zombies':
+          categoryLabel = '🧟 Zombies';
+          valueKey = 'zombies_matados';
+          break;
+        case 'nivel':
+          categoryLabel = '📊 Nivel';
+          valueKey = 'nivel';
+          break;
+        case 'dias':
+          categoryLabel = '📅 Días';
+          valueKey = 'dias_sobrevividos';
+          break;
+        case 'prestigio':
+          categoryLabel = '👑 Prestigio';
+          valueKey = 'prestigio';
+          break;
+      }
+      
+      const html = rankings.map((entry, idx) => {
+        const rank = idx + 1;
+        const rankClass = rank <= 3 ? `rank-${rank}` : '';
+        const isMe = entry.playerId === player.id;
+        const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+        
+        return `
+          <div class="leaderboard-entry ${rankClass}" style="${isMe ? 'border: 2px solid #00ffff;' : ''}">
+            <div>
+              <span style="font-weight: bold; font-size: 14px; margin-right: 10px;">${rankEmoji}</span>
+              <span style="color: ${isMe ? '#00ffff' : '#00ff00'}; font-weight: ${isMe ? 'bold' : 'normal'};">
+                ${entry.nombre}${isMe ? ' (TÚ)' : ''}
+              </span>
+            </div>
+            <div style="font-weight: bold; color: ${rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#fff'};">
+              ${entry[valueKey]?.toLocaleString() || 0}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = html;
+    }
+    
+    // Cargar leaderboard por defecto al abrir tab
+    function loadDefaultLeaderboard() {
+      if (currentLeaderboard) {
+        fetch(`/api/leaderboard/${currentLeaderboard}`)
+          .then(r => r.json())
+          .then(data => {
+            renderLeaderboard(data.rankings, currentLeaderboard);
+          })
+          .catch(err => console.error('Error al cargar leaderboard:', err));
+      }
+    }
+    
     // Enviar con Enter
     document.addEventListener('DOMContentLoaded', () => {
       const chatInput = document.getElementById('chatInput');
@@ -633,53 +2546,81 @@
     });
 
     function renderGame() {
+      if (!player || !world) {
+        console.warn('⚠️ No se puede renderizar: player o world es null', {player, world});
+        return;
+      }
+      
+      console.log('🎨 Renderizando juego...', {player: player.nombre, locacion: player.locacion});
+      
+      // Renders críticos (siempre se ejecutan)
       renderPlayerStats();
-      renderInventory();
       renderLocation();
-      renderLocations();
-      renderNPCs();
       renderWorldTime();
-      renderSkills();
-      renderDefensas();
-      renderQuests();
+      
+      // Renders con caché (solo si cambió el contenido)
+      cachedRender('inventory', renderInventory, player.inventario);
+      cachedRender('skills', renderSkills, player.skills);
+      cachedRender('npcs', renderNPCs, world.npcs);
+      cachedRender('quests', renderQuests, world.quests);
+      cachedRender('defensas', renderDefensas, player.defensas);
+      cachedRender('refugio', renderRefugioRecursos, world.refugio);
+      
+      // Renders condicionales
+      renderLocations();
       renderSpecialEvent();
+      renderNarrativeEvent();
       renderPlayersHere();
-      renderRefugioRecursos();
+      renderInteractiveDialogue();
+      renderMissions();
+      renderPet();
+      renderAbilities();
+      renderFaction();
+      renderVehicle();
+      renderAchievements();
+      renderTimeOfDay();
+      renderRefugioVisual();
     }
 
     function renderPlayerStats() {
+      // Determinar colores según estado crítico
+      const saludColor = player.salud < 30 ? '#ff0000' : player.salud < 50 ? '#ffaa00' : '#00ff00';
+      const hambreColor = player.hambre < 30 ? '#ff0000' : player.hambre < 50 ? '#ffaa00' : '#88ff88';
+      
       const html = `
         <div style="text-align: center; font-size: 60px; margin-bottom: 10px; color: ${player.color || '#00ff00'};">
           ${player.avatar || '👤'}
         </div>
-        <div class="stat">
-          <strong>Nombre:</strong> ${player.nombre}
+        <div class="stat" style="color: #888;">
+          <strong style="color: #00ff00;">Nombre:</strong> ${player.nombre}
         </div>
         <div class="stat" style="color: #ffaa00;">
           <strong>Clase:</strong> ${(player.clase || 'superviviente').toUpperCase()}
         </div>
-        <div class="stat">
+        <div class="stat" style="color: #888;">
           ⭐ Nivel: ${player.nivel || 1} | XP: ${player.xp || 0}/${player.xpParaSiguienteNivel || 100}
           <div class="stat-bar">
             <div class="stat-fill" style="width: ${((player.xp || 0)/(player.xpParaSiguienteNivel || 100)*100)}%; background: #ffaa00;"></div>
           </div>
         </div>
-        <div class="stat">
+        <div class="stat" style="color: #666;">
           💪 Fuerza: ${player.fuerza || 5} | 🛡️ Resistencia: ${player.resistencia || 5}
         </div>
-        <div class="stat">
+        <div class="stat" style="color: #666;">
           ⚡ Agilidad: ${player.agilidad || 5} | 🧠 Inteligencia: ${player.inteligencia || 5}
         </div>
         <div class="stat">
-          ❤️ Salud: ${player.salud}/100
+          <strong style="color: ${saludColor};">❤️ Salud: ${player.salud}/100</strong>
+          ${player.salud < 30 ? ' <span style="color: #ff0000; font-weight: bold;">⚠️ CRÍTICO</span>' : ''}
           <div class="stat-bar">
-            <div class="stat-fill salud" style="width: ${player.salud}%"></div>
+            <div class="stat-fill salud" style="width: ${player.salud}%; background: ${saludColor};"></div>
           </div>
         </div>
         <div class="stat">
-          🍖 Hambre: ${player.hambre}/100
+          <strong style="color: ${hambreColor};">🍖 Hambre: ${player.hambre}/100</strong>
+          ${player.hambre < 30 ? ' <span style="color: #ff0000; font-weight: bold;">⚠️ HAMBRIENTO</span>' : ''}
           <div class="stat-bar">
-            <div class="stat-fill hambre" style="width: ${player.hambre}%"></div>
+            <div class="stat-fill hambre" style="width: ${player.hambre}%; background: ${hambreColor};"></div>
           </div>
         </div>
       `;
@@ -728,6 +2669,27 @@
       }
       
       document.getElementById('locationActions').innerHTML = actionsHtml;
+      
+      // Actualizar info de locación en panel derecho
+      renderLocationInfo();
+    }
+
+    function renderLocationInfo() {
+      if (!world || !world.locations || !player) return;
+      
+      const loc = world.locations[player.locacion];
+      if (!loc) return;
+      
+      const html = `
+        <div>🧟 Zombies: ${loc.zombies || 0}</div>
+        <div>🔊 Ruido: ${loc.nivelRuido || 0}</div>
+        <div>🛡️ Defensas: ${loc.defensas || 0}</div>
+      `;
+      
+      const locationInfoEl = document.getElementById('locationInfo');
+      if (locationInfoEl) {
+        locationInfoEl.innerHTML = html;
+      }
     }
 
     function renderSkills() {
@@ -841,6 +2803,87 @@
       ws.send(JSON.stringify({ type: 'give', npcId, item, cantidad: 1 }));
     }
     
+    function renderInteractiveDialogue() {
+      const container = document.getElementById('interactiveDialogue');
+      if (!container) return;
+      
+      if (!activeDialogue && dialogueHistory.length === 0) {
+        container.innerHTML = '<em style="color: #888;">Sin conversaciones activas</em>';
+        return;
+      }
+      
+      let html = '<div style="max-height: 250px; overflow-y: auto; margin-bottom: 10px;">';
+      
+      // Mostrar historial de conversación
+      dialogueHistory.slice(-5).forEach(entry => {
+        const time = new Date(entry.timestamp).toLocaleTimeString();
+        html += `
+          <div style="margin: 5px 0; padding: 8px; background: #1a2a2a; border-left: 3px solid #00ffff; border-radius: 3px;">
+            <strong style="color: #00ffff;">${entry.speaker}</strong> <span style="color: #666; font-size: 9px;">${time}</span>
+            <div style="color: #ccc; margin-top: 3px; font-size: 12px;">${entry.text}</div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      
+      // Mostrar opciones de respuesta si hay diálogo activo
+      if (activeDialogue) {
+        html += '<div style="background: #2a3a2a; padding: 10px; border-radius: 5px;">';
+        html += `<strong style="color: #ffaa00;">Responder a ${activeDialogue.npcName}:</strong>`;
+        
+        if (activeDialogue.options && activeDialogue.options.length > 0) {
+          html += '<div style="margin-top: 8px;">';
+          activeDialogue.options.forEach((option, idx) => {
+            html += `
+              <button onclick="respondToDialogue(${idx})" style="display: block; width: 100%; margin: 5px 0; padding: 8px; font-size: 11px; text-align: left; background: #3a4a3a; border: 1px solid #00ff00;">
+                ${option.texto}
+              </button>
+            `;
+          });
+          html += '</div>';
+        } else {
+          html += '<button onclick="clearDialogue()" style="width: 100%; margin-top: 8px; padding: 8px;">Continuar</button>';
+        }
+        
+        html += '</div>';
+      } else if (dialogueHistory.length > 0) {
+        html += '<button onclick="clearDialogue()" style="width: 100%; padding: 8px;">🗑️ Limpiar historial</button>';
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    function respondToDialogue(optionIndex) {
+      if (!activeDialogue) return;
+      
+      const option = activeDialogue.options[optionIndex];
+      
+      // Agregar respuesta del jugador al historial
+      dialogueHistory.push({
+        speaker: player.nombre,
+        text: option.texto,
+        timestamp: Date.now()
+      });
+      
+      // Enviar respuesta al servidor
+      ws.send(JSON.stringify({
+        type: 'dialogue:respond',
+        npcId: activeDialogue.npcId,
+        optionIndex
+      }));
+      
+      // Limpiar diálogo activo
+      activeDialogue = null;
+      renderInteractiveDialogue();
+    }
+    
+    function clearDialogue() {
+      activeDialogue = null;
+      dialogueHistory = [];
+      renderInteractiveDialogue();
+    }
+    
     function renderSpecialEvent() {
       if (!world.activeEvents || world.activeEvents.length === 0) {
         document.getElementById('specialEvent').innerHTML = '<em style="color: #888;">Sin eventos</em>';
@@ -868,6 +2911,75 @@
     
     function respondEvent(eventId, opcionIndex) {
       ws.send(JSON.stringify({ type: 'event:respond', eventId, opcionIndex }));
+    }
+    
+    // ====================================
+    // RENDERIZAR EVENTO NARRATIVO
+    // ====================================
+    function renderNarrativeEvent() {
+      const container = document.getElementById('specialEvent');
+      if (!world.activeNarrativeEvent) {
+        return; // No sobrescribir si hay eventos regulares
+      }
+      
+      const evento = world.activeNarrativeEvent;
+      const html = `
+        <div style="background: #1a1a2a; padding: 15px; border: 3px solid #8800ff; border-radius: 8px; box-shadow: 0 0 20px rgba(136, 0, 255, 0.5);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <div style="font-size: 32px;">📖</div>
+            <div>
+              <strong style="color: #aa88ff; font-size: 14px;">${evento.nombre}</strong>
+              <div style="font-size: 9px; color: #888;">Parte ${evento.parte} - Historia Encadenada</div>
+            </div>
+          </div>
+          <p style="margin: 10px 0; font-size: 12px; color: #ccc; line-height: 1.4;">
+            ${evento.descripcion}
+          </p>
+          <div style="margin-top: 15px;">
+            ${evento.opciones.map((op, idx) => {
+              let costoStr = '';
+              let riesgoStr = '';
+              let recompensaStr = '';
+              
+              if (op.costo && Object.keys(op.costo).length > 0) {
+                costoStr = '<br><small style="color: #ff8888;">💰 ' + Object.entries(op.costo).map(([k,v]) => `${k}:${v}`).join(', ') + '</small>';
+              }
+              
+              if (op.riesgo && op.riesgo > 0) {
+                riesgoStr = `<br><small style="color: #ffaa00;">⚠️ Riesgo: ${(op.riesgo * 100).toFixed(0)}%</small>`;
+              }
+              
+              if (op.recompensa && Object.keys(op.recompensa).length > 0) {
+                const recompensaTexto = Object.entries(op.recompensa)
+                  .map(([k,v]) => {
+                    if (k === 'moral') return `moral ${v > 0 ? '+' : ''}${v}`;
+                    if (k === 'defensas') return `defensas +${v}`;
+                    if (k === 'npc_nuevo') return `NPC: ${v}`;
+                    return `${k}:${v}`;
+                  })
+                  .join(', ');
+                recompensaStr = `<br><small style="color: #88ff88;">✓ ${recompensaTexto}</small>`;
+              }
+              
+              return `
+                <button onclick="respondNarrativeEvent(${idx})" 
+                        style="display: block; width: 100%; margin: 8px 0; padding: 12px; font-size: 12px; 
+                               background: #2a1a3a; border: 2px solid #aa88ff; color: #fff; cursor: pointer;
+                               transition: all 0.3s; text-align: left;">
+                  <strong>${idx + 1}. ${op.texto}</strong>
+                  ${costoStr}${riesgoStr}${recompensaStr}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+      container.innerHTML = html;
+    }
+    
+    function respondNarrativeEvent(opcionIndex) {
+      playSound('success');
+      ws.send(JSON.stringify({ type: 'narrative:respond', opcionIndex }));
     }
     
     function renderDefensas() {
@@ -940,6 +3052,63 @@
       document.getElementById('refugioRecursos').innerHTML = html || '<em style="color: #888;">Sin recursos</em>';
     }
 
+    function renderOnlinePlayers(players) {
+      const onlineCount = document.getElementById('onlineCount');
+      const onlinePlayers = document.getElementById('onlinePlayers');
+      
+      if (!players || players.length === 0) {
+        onlineCount.textContent = '0';
+        onlinePlayers.innerHTML = '<em style="color: #888;">Sin jugadores conectados</em>';
+        // Limpiar select de DMs
+        document.getElementById('dmTargetSelect').innerHTML = '<option value="">Sin jugadores online</option>';
+        return;
+      }
+      
+      onlineCount.textContent = players.length;
+      
+      // Actualizar caché de jugadores
+      players.forEach(p => {
+        allPlayers[p.id] = p.nombre;
+      });
+      
+      // Actualizar select de DMs
+      const dmSelect = document.getElementById('dmTargetSelect');
+      dmSelect.innerHTML = '<option value="">Selecciona jugador...</option>' + 
+        players
+          .filter(p => p.id !== player.id)
+          .map(p => `<option value="${p.id}">${p.nombre}</option>`)
+          .join('');
+      
+      const html = players.map(p => {
+        const isMe = p.id === player.id;
+        const locationName = world.locations && world.locations[p.locacion] 
+          ? world.locations[p.locacion].nombre 
+          : p.locacion;
+        
+        const stats = p.stats || {};
+        const zombies = stats.zombies_matados || 0;
+        let rankBadge = '';
+        if (zombies > 100) rankBadge = '💀';
+        else if (zombies > 50) rankBadge = '⚔️';
+        else if (zombies > 20) rankBadge = '🔪';
+        
+        return `
+          <div class="player-card-inspect" onclick="${isMe ? '' : `inspectPlayer('${p.id}')`}" style="${isMe ? 'background: #2a4a2a; border-left-color: #ffff00; cursor: default;' : ''}">
+            ${rankBadge ? `<div class="rank-badge">${rankBadge}</div>` : ''}
+            <div style="font-weight: bold; color: ${isMe ? '#ffff00' : '#00ff00'}; font-size: 14px;">
+              ${isMe ? '⭐ ' : ''}${p.nombre}${isMe ? ' (Tú)' : ''}
+            </div>
+            <div style="font-size: 11px; color: #888; margin-top: 5px;">
+              📍 ${locationName} | Nv.${p.nivel || 1} | ❤️ ${p.salud || 100}
+            </div>
+            ${!isMe ? '<div style="font-size: 10px; color: #00ff00; margin-top: 5px;">👁️ Click para inspeccionar</div>' : ''}
+          </div>
+        `;
+      }).join('');
+      
+      onlinePlayers.innerHTML = html;
+    }
+
     function renderQuestCooperativa(quest) {
       const html = `
         <div style="background: #2a4a2a; padding: 10px; border-radius: 5px; border: 2px solid #ffff00;">
@@ -972,6 +3141,635 @@
         opcion: opcion
       }));
     }
+
+    // Sistema de notificaciones
+    function showNotification(message, type = 'success') {
+      const notif = document.createElement('div');
+      notif.className = `notification ${type}`;
+      notif.textContent = message;
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => notif.remove(), 300);
+      }, 3000);
+    }
+
+    // Mejorar handleMessage para incluir notificaciones
+    const originalHandleMessage = handleMessage;
+    handleMessage = function(msg) {
+      // Notificaciones especiales
+      if (msg.type === 'player:joined' && msg.playerId !== player.id) {
+        showNotification(`${msg.nombre} se unió al juego`, 'success');
+      }
+      if (msg.type === 'level:up') {
+        showNotification(`¡NIVEL ${msg.nivel}!`, 'success');
+      }
+      if (msg.type === 'horde:warning') {
+        showNotification('⚠️ HORDA ACERCÁNDOSE', 'danger');
+      }
+      
+      // Llamar a la función original
+      originalHandleMessage(msg);
+    };
+
+    // Atajos de teclado
+    document.addEventListener('keydown', (e) => {
+      // Si está escribiendo en el chat, ignorar
+      if (document.activeElement.id === 'chatInput' || 
+          document.activeElement.id === 'playerName') {
+        return;
+      }
+      
+      // S = Scavenge
+      if (e.key === 's' || e.key === 'S') {
+        scavenge();
+      }
+      // C = Combat
+      if (e.key === 'c' || e.key === 'C') {
+        combat();
+      }
+      // T = Trade
+      if (e.key === 't' || e.key === 'T') {
+        tradeWithNPC('comerciante');
+      }
+      // H = Hablar con Dr. Gómez
+      if (e.key === 'h' || e.key === 'H') {
+        talkToNPC('dr_gomez');
+      }
+    });
+
+    // Auto-guardar el estado periódicamente
+    setInterval(() => {
+      if (player && player.id) {
+        // El servidor ya guarda automáticamente, solo actualizar UI
+        if (world && world.locations) {
+          renderGame();
+        }
+      }
+    }, 10000); // Cada 10 segundos
+
+    // ====================================
+    // NUEVAS FUNCIONES - SISTEMAS AVANZADOS
+    // ====================================
+
+    // Crear grupo
+    async function createGroup() {
+      const groupName = prompt('Nombre del grupo:');
+      if (!groupName) return;
+      
+      const data = await safeFetch('/api/group/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, groupName })
+      });
+      
+      if (data.success) {
+        showNotification('Grupo creado!', 'success');
+        renderGroupPanel(data.group);
+      }
+    }
+
+    // Invitar a jugador al grupo
+    async function inviteToGroup(targetId) {
+      const response = await fetch('/api/group/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, targetId })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        showNotification('Jugador invitado!', 'success');
+        renderGroupPanel(data.group);
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // Salir del grupo
+    async function leaveGroup() {
+      if (!confirm('¿Salir del grupo?')) return;
+      
+      const response = await fetch('/api/group/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        showNotification('Saliste del grupo', 'success');
+        document.getElementById('groupPanel').innerHTML = '<button onclick="createGroup()" style="width: 100%; padding: 10px; margin: 5px 0;">➕ Crear Grupo</button>';
+      }
+    }
+
+    // Mejorar refugio
+    async function upgradeRefugio(upgradeType) {
+      const response = await fetch('/api/refugio/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, upgradeType })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        showNotification(`${upgradeType} mejorado!`, 'success');
+        player.inventario = data.inventario;
+        renderGame();
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // Abrir diálogo de comercio
+    function openTradeDialog() {
+      const targetId = document.getElementById('tradeTargetSelect').value;
+      if (!targetId || targetId === 'none') {
+        showNotification('Selecciona un jugador', 'warning');
+        return;
+      }
+      
+      // Crear diálogo simple para definir la oferta
+      const offering = prompt('¿Qué ofreces? (formato: comida:5,materiales:3)');
+      const requesting = prompt('¿Qué solicitas? (formato: medicinas:2,armas:1)');
+      
+      if (!offering || !requesting) return;
+      
+      const parseItems = (str) => {
+        const items = {};
+        str.split(',').forEach(pair => {
+          const [item, amount] = pair.trim().split(':');
+          items[item] = parseInt(amount);
+        });
+        return items;
+      };
+      
+      createTradeOffer(targetId, parseItems(offering), parseItems(requesting));
+    }
+
+    // Crear oferta de comercio
+    async function createTradeOffer(targetId, offering, requesting) {
+      const response = await fetch('/api/trade/offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, targetId, offering, requesting })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        showNotification('Oferta enviada!', 'success');
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // Responder a oferta de comercio
+    async function respondToTrade(offerId, accept) {
+      const response = await fetch('/api/trade/respond', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, offerId, accept })
+      });
+      
+      const data = await response.json();
+      showNotification(data.message || data.error, data.success ? 'success' : 'warning');
+      if (data.success) renderGame();
+    }
+
+    // Renderizar panel de grupo
+    function renderGroupPanel(group) {
+      if (!group) {
+        document.getElementById('groupPanel').innerHTML = '<button onclick="createGroup()" style="width: 100%; padding: 10px; margin: 5px 0;">➕ Crear Grupo</button>';
+        document.getElementById('groupMemberCount').textContent = '';
+        return;
+      }
+      
+      const membersHTML = group.members.map(mid => {
+        const member = world.players && world.players[mid];
+        return member ? `<div style="margin: 5px 0;">${member.nombre} ${member.id === player.id ? '(Tú)' : ''}</div>` : '';
+      }).join('');
+      
+      document.getElementById('groupPanel').innerHTML = `
+        <div style="padding: 10px; background: #1a3a1a; border-radius: 5px;">
+          <strong style="color: #ffff00;">${group.name}</strong>
+          <div style="margin-top: 10px;">${membersHTML}</div>
+          <button onclick="leaveGroup()" style="width: 100%; margin-top: 10px; padding: 8px; background: #4a1a1a;">🚪 Salir del Grupo</button>
+        </div>
+      `;
+      
+      document.getElementById('groupMemberCount').textContent = `(${group.members.length}/4)`;
+    }
+
+    // Renderizar logros
+    function renderAchievements() {
+      if (!player.achievements || Object.keys(player.achievements).length === 0) {
+        document.getElementById('achievements').innerHTML = '<em style="color: #888;">Sin logros desbloqueados</em>';
+        document.getElementById('achievementCount').textContent = '';
+        return;
+      }
+      
+      const achieved = Object.keys(player.achievements);
+      const html = achieved.map(id => {
+        const achievement = world.achievements && world.achievements[id];
+        if (!achievement) return '';
+        return `
+          <div style="margin: 5px 0; padding: 5px; background: #2a3a1a; border-left: 3px solid #ffaa00; border-radius: 3px;">
+            <strong>${achievement.icono} ${achievement.nombre}</strong>
+            <div style="font-size: 10px; color: #888; margin-top: 2px;">${achievement.descripcion}</div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('achievements').innerHTML = html;
+      document.getElementById('achievementCount').textContent = `(${achieved.length}/${Object.keys(world.achievements || {}).length})`;
+    }
+
+    // Renderizar tiempo día/noche
+    function renderTimeOfDay() {
+      if (!world.timeOfDay && world.timeOfDay !== 0) return;
+      
+      const hour = world.timeOfDay;
+      const day = world.dayCount || 1;
+      const timeStr = `${String(hour).padStart(2, '0')}:00`;
+      
+      let icon = '☀️';
+      let color = '#ffff00';
+      if (hour >= 20 || hour <= 6) {
+        icon = '🌙';
+        color = '#4444ff';
+      } else if (hour >= 18 || hour <= 8) {
+        icon = '🌅';
+        color = '#ffaa00';
+      }
+      
+      document.getElementById('timeDisplay').innerHTML = `<span style="color: ${color};">${icon} Día ${day} - ${timeStr}</span>`;
+    }
+
+    // Renderizar estadísticas del jugador
+    function renderPlayerStats2() {
+      if (!player.stats) return;
+      
+      const html = `
+        <div>🧟 Zombies: ${player.stats.zombies_matados || 0}</div>
+        <div>🔨 Crafteos: ${player.stats.items_crafteados || 0}</div>
+        <div>🗺️ Locaciones: ${player.stats.locaciones_visitadas || 1}</div>
+        <div>📦 Recursos: ${player.stats.recursos_totales || 0}</div>
+        <div>🤝 Comercios: ${player.stats.comercios_completados || 0}</div>
+        <div>💪 Tanques: ${player.stats.tanques_matados || 0}</div>
+      `;
+      
+      document.getElementById('playerStats2').innerHTML = html;
+    }
+
+    // Actualizar selector de jugadores para comercio
+    function updateTradePlayerSelect(players) {
+      const select = document.getElementById('tradeTargetSelect');
+      if (!select) return;
+      
+      const options = players
+        .filter(p => p.id !== player.id)
+        .map(p => `<option value="${p.id}">${p.nombre} (Nv.${p.nivel})</option>`)
+        .join('');
+      
+      select.innerHTML = options || '<option value="none">Sin jugadores disponibles</option>';
+    }
+
+    // Extender renderGame para incluir nuevos sistemas
+    const originalRenderGame = renderGame;
+    renderGame = function() {
+      originalRenderGame();
+      renderAchievements();
+      renderTimeOfDay();
+      renderPlayerStats2();
+    };
+
+    // Handler para logros desbloqueados
+    function handleAchievementUnlocked(achievement) {
+      showNotification(`🏆 Logro desbloqueado: ${achievement.nombre}!`, 'success');
+      log(`🏆 Desbloqueaste: ${achievement.nombre} - ${achievement.descripcion}`, 'success');
+    }
+
+    // ====================================
+    // FUNCIONES PARA NUEVOS SISTEMAS
+    // ====================================
+
+    // MISIONES
+    function renderMissions() {
+      if (!world.activeMissions || world.activeMissions.length === 0) {
+        document.getElementById('missionsPanel').innerHTML = '<em style="color: #888;">Sin misiones disponibles</em>';
+        document.getElementById('missionCount').textContent = '';
+        return;
+      }
+
+      const availableMissions = world.activeMissions.filter(m => !m.completedBy.includes(player.id));
+      
+      const html = availableMissions.map(mission => {
+        return `
+          <div style="margin: 8px 0; padding: 8px; background: #2a2a1a; border-left: 3px solid #ffaa00; border-radius: 3px;">
+            <strong style="color: #ffaa00;">${mission.descripcion}</strong>
+            <div style="font-size: 10px; color: #aaa; margin: 4px 0;">Tipo: ${mission.tipo} | Cantidad: ${mission.cantidad}</div>
+            <div style="font-size: 10px; color: #0f0;">Recompensa: ${Object.entries(mission.recompensa).map(([k,v]) => `${k}:${v}`).join(', ')}</div>
+            <button onclick="completeMission('${mission.id}')" style="width: 100%; margin-top: 5px; padding: 5px; font-size: 10px;">✅ Completar</button>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('missionsPanel').innerHTML = html || '<em style="color: #888;">Todas completadas</em>';
+      document.getElementById('missionCount').textContent = `(${availableMissions.length})`;
+    }
+
+    async function completeMission(missionId) {
+      // Prevenir clicks múltiples
+      if (pendingActions.has(`mission-${missionId}`)) return;
+      pendingActions.add(`mission-${missionId}`);
+      
+      const data = await safeFetch('/api/mission/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, missionId })
+      });
+      
+      pendingActions.delete(`mission-${missionId}`);
+      if (data.success) {
+        showNotification('✅ Misión completada!', 'success');
+        renderGame();
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // MASCOTAS
+    function renderPet() {
+      if (!player.mascota) {
+        document.getElementById('petPanel').innerHTML = `
+          <p style="color: #888; margin-bottom: 10px;">No tienes mascota</p>
+          <button onclick="adoptPet('perro')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 11px;">🐕 Adoptar Perro</button>
+          <button onclick="adoptPet('lobo')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 11px;">🐺 Adoptar Lobo</button>
+          <button onclick="adoptPet('cuervo')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 11px;">🦅 Adoptar Cuervo</button>
+        `;
+        return;
+      }
+
+      const pet = player.mascota;
+      document.getElementById('petPanel').innerHTML = `
+        <div style="padding: 10px; background: #1a2a2a; border-radius: 5px;">
+          <strong style="color: #00ffff; font-size: 14px;">${pet.nombre} Nv.${pet.nivel}</strong>
+          <div style="margin: 8px 0;">
+            <div style="font-size: 10px;">Hambre:</div>
+            <div class="stat-bar" style="height: 10px; width: 100%;">
+              <div class="stat-fill hambre" style="width: ${pet.hambre}%;"></div>
+            </div>
+          </div>
+          <div style="margin: 8px 0;">
+            <div style="font-size: 10px;">Moral:</div>
+            <div class="stat-bar" style="height: 10px; width: 100%;">
+              <div class="stat-fill moral" style="width: ${pet.moral}%;"></div>
+            </div>
+          </div>
+          <div style="font-size: 10px; color: #888; margin: 5px 0;">${pet.habilidad}</div>
+          <button onclick="feedPet('comida')" style="width: 100%; padding: 6px; margin: 3px 0; font-size: 10px;">🍖 Alimentar (comida)</button>
+          <button onclick="feedPet('carne')" style="width: 100%; padding: 6px; margin: 3px 0; font-size: 10px;">🥩 Alimentar (carne)</button>
+        </div>
+      `;
+    }
+
+    async function adoptPet(petType) {
+      if (pendingActions.has('adoptPet')) return;
+      pendingActions.add('adoptPet');
+      
+      const data = await safeFetch('/api/pet/adopt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, petType })
+      });
+      
+      pendingActions.delete('adoptPet');
+      
+      if (data.success) {
+        player.mascota = data.mascota;
+        showNotification(`🐾 Adoptaste ${data.mascota.nombre}!`, 'success');
+        renderPet();
+      }
+    }
+
+    async function feedPet(item) {
+      if (pendingActions.has('feedPet')) return;
+      pendingActions.add('feedPet');
+      
+      const data = await safeFetch('/api/pet/feed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, item })
+      });
+      
+      pendingActions.delete('feedPet');
+      
+      if (data.success) {
+        player.mascota = data.mascota;
+        player.inventario = data.inventario;
+        showNotification('🍖 Mascota alimentada!', 'success');
+        renderGame();
+      }
+    }
+
+    // HABILIDADES ESPECIALES
+    function renderAbilities() {
+      if (!player.clase) {
+        document.getElementById('abilitiesPanel').innerHTML = '<em style="color: #888;">Necesitas una clase</em>';
+        return;
+      }
+
+      const classAbilities = {
+        'soldado': ['curacion_rapida', 'rafaga_mortal'],
+        'explorador': ['sigilo_perfecto', 'visión_extendida'],
+        'ingeniero': ['crafteo_instantaneo', 'reparacion_rapida'],
+        'medico': ['curacion_rapida', 'inmunidad_temporal'],
+        'lider': ['escudo_grupal', 'moral_boost']
+      };
+
+      const abilities = classAbilities[player.clase] || [];
+      
+      const html = abilities.map(abilityId => {
+        const ability = world.specialAbilities && world.specialAbilities[abilityId];
+        if (!ability) return '';
+        
+        const onCooldown = player.abilityCooldowns && player.abilityCooldowns[abilityId] && Date.now() < player.abilityCooldowns[abilityId];
+        const cooldownText = onCooldown ? ` (${Math.ceil((player.abilityCooldowns[abilityId] - Date.now()) / 1000)}s)` : '';
+        
+        return `
+          <button onclick="useAbility('${abilityId}')" ${onCooldown ? 'disabled' : ''} style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">
+            ⚡ ${ability.nombre}${cooldownText}
+          </button>
+        `;
+      }).join('');
+
+      document.getElementById('abilitiesPanel').innerHTML = html || '<em style="color: #888;">Sin habilidades disponibles</em>';
+    }
+
+    async function useAbility(abilityId) {
+      if (pendingActions.has(`ability-${abilityId}`)) return;
+      pendingActions.add(`ability-${abilityId}`);
+      
+      const data = await safeFetch('/api/ability/use', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, abilityId })
+      });
+      
+      pendingActions.delete(`ability-${abilityId}`);
+      
+      if (data.success) {
+        showNotification(`⚡ Usaste: ${data.ability.nombre}!`, 'success');
+        renderGame();
+      }
+    }
+
+    // FACCIONES
+    function renderFaction() {
+      if (!player.faccion) {
+        document.getElementById('factionPanel').innerHTML = `
+          <p style="color: #888; margin-bottom: 10px;">Únete a una facción para desbloquear recompensas</p>
+          <button onclick="joinFaction('refugio')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">🏠 Los Refugiados</button>
+          <button onclick="joinFaction('nomadas')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">🚶 Nómadas</button>
+          <button onclick="joinFaction('cientificos')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">🔬 Los Científicos</button>
+          <button onclick="joinFaction('saqueadores')" style="width: 100%; padding: 8px; margin: 3px 0; font-size: 10px;">💀 Saqueadores</button>
+        `;
+        document.getElementById('factionRank').textContent = '';
+        return;
+      }
+
+      const faction = world.factions && world.factions.find(f => f.id === player.faccion);
+      if (!faction) return;
+
+      document.getElementById('factionPanel').innerHTML = `
+        <div style="padding: 10px; background: #2a1a1a; border-radius: 5px;">
+          <strong style="color: #ff8800; font-size: 14px;">${faction.nombre}</strong>
+          <div style="font-size: 10px; color: #aaa; margin: 5px 0;">${faction.descripcion}</div>
+          <div style="margin: 8px 0; font-size: 11px;">Puntos: ${player.faccionPuntos || 0}</div>
+        </div>
+      `;
+      
+      document.getElementById('factionRank').textContent = `Rango ${player.faccionRango || 1}`;
+    }
+
+    async function joinFaction(factionId) {
+      const response = await fetch('/api/faction/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, factionId })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        player.faccion = factionId;
+        showNotification(`⚔️ Te uniste a: ${data.faction.nombre}!`, 'success');
+        renderFaction();
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // VEHÍCULOS
+    function renderVehicle() {
+      if (!player.vehiculo) return;
+
+      const vehicle = player.vehiculo;
+      document.getElementById('vehiclePanel').innerHTML = `
+        <div style="padding: 10px; background: #1a1a2a; border-radius: 5px;">
+          <strong style="color: #00ff00; font-size: 14px;">${vehicle.nombre}</strong>
+          <div style="margin: 8px 0;">
+            <div style="font-size: 10px;">Combustible:</div>
+            <div class="stat-bar" style="height: 10px; width: 100%;">
+              <div class="stat-fill hambre" style="width: ${vehicle.combustible}%;"></div>
+            </div>
+          </div>
+          <div style="margin: 8px 0;">
+            <div style="font-size: 10px;">Durabilidad:</div>
+            <div class="stat-bar" style="height: 10px; width: 100%;">
+              <div class="stat-fill salud" style="width: ${vehicle.durabilidad}%;"></div>
+            </div>
+          </div>
+          <div style="font-size: 10px; color: #888; margin: 5px 0;">Velocidad: +${vehicle.velocidad} | Protección: ${vehicle.proteccion}%</div>
+        </div>
+      `;
+    }
+
+    async function craftVehicle(vehicleType) {
+      const response = await fetch('/api/vehicle/craft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, vehicleType })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        player.vehiculo = data.vehiculo;
+        player.inventario = data.inventario;
+        showNotification(`🚗 Construiste: ${data.vehiculo.nombre}!`, 'success');
+        renderGame();
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // PVP ARENA
+    let currentPvPMatch = null;
+
+    async function enterPvPArena() {
+      if (player.salud < 50) {
+        showNotification('Necesitas al menos 50 de salud', 'warning');
+        return;
+      }
+
+      const response = await fetch('/api/pvp/enter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        showNotification(`⚔️ En cola PvP (Posición: ${data.queuePosition})`, 'success');
+        document.getElementById('pvpQueue').textContent = `Cola: ${data.queuePosition}`;
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    async function attackInPvP() {
+      if (!currentPvPMatch) return;
+
+      const response = await fetch('/api/pvp/attack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, matchId: currentPvPMatch })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        if (data.victory) {
+          showNotification('🏆 ¡VICTORIA! +100 XP', 'success');
+          document.getElementById('pvpMatch').style.display = 'none';
+          currentPvPMatch = null;
+        }
+      } else {
+        showNotification(data.error, 'warning');
+      }
+    }
+
+    // Actualizar función renderGame para incluir nuevos sistemas
+    const _originalRenderGame = renderGame;
+    renderGame = function() {
+      _originalRenderGame();
+      renderMissions();
+      renderPet();
+      renderAbilities();
+      renderFaction();
+      renderVehicle();
+    };
+
+    console.log('🧟 Survival Zombie MVP cargado. Usa teclas rápidas: S=Scavenge, C=Combat, T=Trade, H=Hablar');
   </script>
 </body>
 </html>

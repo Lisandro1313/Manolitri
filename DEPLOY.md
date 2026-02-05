@@ -3,6 +3,7 @@
 ## 📋 Paso 1: Subir a GitHub
 
 ### Si NO tienes Git configurado:
+
 ```bash
 # Configurar Git (primera vez)
 git config --global user.name "Tu Nombre"
@@ -10,6 +11,7 @@ git config --global user.email "tu@email.com"
 ```
 
 ### Subir el proyecto:
+
 ```bash
 # 1. Inicializar repositorio
 git init
@@ -34,6 +36,7 @@ git push -u origin main
 ## 🚂 Paso 2: Deploy en Railway
 
 ### Opción A: Deploy desde GitHub (RECOMENDADO)
+
 1. Ve a [railway.app](https://railway.app)
 2. Click **"Login"** → Login con GitHub
 3. Click **"New Project"**
@@ -49,6 +52,7 @@ git push -u origin main
 10. ¡LISTO! Tu URL será algo como: `https://survival-zombie-production.up.railway.app`
 
 ### Opción B: Deploy directo (sin GitHub)
+
 1. Ve a [railway.app](https://railway.app)
 2. Click **"New Project"** → **"Deploy from local directory"**
 3. Instala Railway CLI:
@@ -67,6 +71,7 @@ git push -u origin main
 ## 🌐 Paso 3: Compartir con Amigos
 
 Una vez deployado:
+
 1. Copia la URL de Railway (ej: `https://tu-proyecto.up.railway.app`)
 2. Compártela con amigos por WhatsApp/Discord/etc
 3. Todos crean cuenta en tu juego
@@ -93,17 +98,20 @@ git push
 ## 💰 Costos
 
 **Railway FREE tier:**
+
 - $5 USD de crédito gratis al mes
 - Suficiente para ~500 horas de servidor
 - Si juegas 4 horas al día = ~120 horas/mes = GRATIS
 
 **Si excedes el free tier:**
+
 - Solo pagas lo que usas ($0.01/hora aprox)
 - Máximo ~$10-15/mes con uso intensivo
 
 ## 🐛 Troubleshooting
 
 ### Error: "Build failed"
+
 ```bash
 # Asegúrate que package.json está correcto
 cat package.json
@@ -113,16 +121,19 @@ npm install
 ```
 
 ### Error: "Application failed to respond"
+
 - Verifica que el puerto use `process.env.PORT || 3000`
 - Railway asigna el puerto automáticamente
 
 ### Base de datos se resetea
+
 - SQLite en Railway es efímera (se borra en cada deploy)
 - **Solución**: Migra a Railway PostgreSQL (gratis también)
   1. En Railway: **New** → **Database** → **PostgreSQL**
   2. Actualiza código para usar PostgreSQL en vez de SQLite
 
 ### WebSocket no conecta
+
 - Railway soporta WebSockets automáticamente
 - Verifica que uses la URL correcta (https:// no ws://)
 
@@ -159,7 +170,7 @@ git pull
 
 ## 🎮 ¡Listo!
 
-Ahora tienes tu juego en producción 24/7 accesible desde cualquier lugar del mundo. 
+Ahora tienes tu juego en producción 24/7 accesible desde cualquier lugar del mundo.
 
 **Comparte la URL y juega con amigos!** 🧟‍♂️
 
