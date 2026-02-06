@@ -81,12 +81,18 @@ class NPCRelationshipSystem {
 
         // Parsear historia de forma segura
         let historia = [];
-        if (rel.historia && rel.historia.trim()) {
-            try {
-                historia = JSON.parse(rel.historia);
-            } catch (e) {
-                console.error('Error parseando historia de relación:', e.message);
-                historia = [];
+        if (rel.historia) {
+            if (Array.isArray(rel.historia)) {
+                // Ya es un array
+                historia = rel.historia;
+            } else if (typeof rel.historia === 'string' && rel.historia.trim()) {
+                // Es un string, intentar parsear
+                try {
+                    historia = JSON.parse(rel.historia);
+                } catch (e) {
+                    console.error('Error parseando historia de relación:', e.message);
+                    historia = [];
+                }
             }
         }
 
