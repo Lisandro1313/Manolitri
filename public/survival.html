@@ -635,6 +635,10 @@
           <button class="tab-button active" onclick="switchTab('main')">
             🎮 JUEGO
           </button>
+          <button class="tab-button" onclick="switchTab('missions')" id="tab-btn-missions">
+            📖 MISIONES
+            <span class="tab-badge" id="badge-missions" style="display: none;">!</span>
+          </button>
           <button class="tab-button" onclick="switchTab('events')" id="tab-btn-events">
             📜 EVENTOS
             <span class="tab-badge" id="badge-events" style="display: none;">!</span>
@@ -642,6 +646,10 @@
           <button class="tab-button" onclick="switchTab('social')" id="tab-btn-social">
             👥 SOCIAL
             <span class="tab-badge" id="badge-social" style="display: none;">!</span>
+          </button>
+          <button class="tab-button" onclick="switchTab('mundo')" id="tab-btn-mundo">
+            🌍 MUNDO
+            <span class="tab-badge" id="badge-mundo" style="display: none;">!</span>
           </button>
           <button class="tab-button" onclick="switchTab('progression')">
             📊 PROGRESIÓN
@@ -752,6 +760,119 @@
                 <button onclick="quickAction('eat')" style="padding: 8px; background: #443300; border: 1px solid #886600;">
                   🍖 Comer<br><small style="opacity: 0.8;">+40 hambre +5 salud</small>
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA MISIONES NARRATIVAS -->
+        <div id="tab-missions" class="tab-content">
+          <div class="container">
+            <!-- Panel principal: Misión en curso o lista de misiones -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <div id="narrativeMissionActive" style="display: none;">
+                <!-- MISIÓN EN CURSO -->
+                <h2 id="narrativeMissionTitle" style="margin-bottom: 15px;">📖 Misión en Curso</h2>
+                
+                <!-- Texto narrativo -->
+                <div id="narrativeStoryText" style="
+                  background: linear-gradient(135deg, #1a1a2a 0%, #2a1a1a 100%);
+                  border: 2px solid #ffaa00;
+                  border-radius: 8px;
+                  padding: 20px;
+                  margin-bottom: 20px;
+                  font-size: 14px;
+                  line-height: 1.6;
+                  color: #ffffff;
+                  text-align: left;
+                  min-height: 100px;
+                ">
+                  Cargando...
+                </div>
+
+                <!-- Timer y modo -->
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                  <div id="narrativeTimer" style="
+                    background: #ff4444;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    font-size: 18px;
+                  ">
+                    ⏱️ 20s
+                  </div>
+                  <div id="narrativeMode" style="
+                    background: #4444ff;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    font-weight: bold;
+                  ">
+                    👤 SOLO
+                  </div>
+                </div>
+
+                <!-- Votación grupal (si aplica) -->
+                <div id="narrativeVoting" style="display: none; margin-bottom: 15px;">
+                  <div style="background: #2a2a4a; padding: 15px; border-radius: 5px;">
+                    <h3 style="color: #ffaa00; margin-bottom: 10px;">🗳️ VOTACIÓN EN CURSO</h3>
+                    <div id="voteCount" style="font-size: 14px; color: #ccc;">
+                      Votos: 0 / 0
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Opciones de elección -->
+                <div id="narrativeChoices" style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 15px;
+                  margin-bottom: 20px;
+                ">
+                  <!-- Se llenarán dinámicamente -->
+                </div>
+
+                <!-- Botón abandonar -->
+                <button onclick="abandonNarrativeMission()" style="
+                  background: #666;
+                  color: white;
+                  border: none;
+                  padding: 8px 15px;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  font-size: 12px;
+                ">
+                  ❌ Abandonar Misión
+                </button>
+              </div>
+
+              <div id="narrativeMissionList">
+                <!-- LISTA DE MISIONES DISPONIBLES -->
+                <h2>📖 MISIONES NARRATIVAS DISPONIBLES</h2>
+                <p style="font-size: 12px; color: #888; margin-bottom: 20px;">
+                  Misiones interactivas con historia, decisiones y consecuencias reales.
+                </p>
+                
+                <button onclick="loadNarrativeMissions()" style="padding: 8px 15px; margin-bottom: 15px;">
+                  🔄 Actualizar Misiones
+                </button>
+
+                <div id="narrativeMissionCards" style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: 15px;
+                ">
+                  <p style="text-align: center; color: #888;">Cargando misiones...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de info/historial -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <h2>📊 ESTADÍSTICAS DE MISIONES</h2>
+              <div id="narrativeMissionStats" style="font-size: 12px;">
+                <p style="color: #888;">Completa misiones para ver tus estadísticas.</p>
               </div>
             </div>
           </div>
@@ -878,7 +999,70 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 4: PROGRESIÓN -->
+        <!-- PESTAÑA 4: MUNDO VIVO -->
+        <div id="tab-mundo" class="tab-content">
+          <div class="container">
+            <!-- Misiones Dinámicas -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <h2>⚡ MISIONES DINÁMICAS <span id="questCountBadge" style="font-size: 12px; color: #00ff00;"></span></h2>
+              <p style="font-size: 11px; color: #888; margin-bottom: 10px;">
+                Misiones generadas por los dramas y eventos del mundo. ¡Intervén en las historias de los NPCs!
+              </p>
+              <button onclick="refreshQuests()" style="padding: 8px 15px; margin-bottom: 10px;">🔄 Refrescar</button>
+              <div id="questsList" style="max-height: 400px; overflow-y: auto;">
+                <p style="text-align: center; color: #888; padding: 20px;">
+                  ⏳ Cargando misiones...
+                </p>
+              </div>
+            </div>
+
+            <!-- Feed de Noticias del Mundo -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <h2>📰 FEED DEL MUNDO</h2>
+              <p style="font-size: 11px; color: #888; margin-bottom: 10px;">
+                Lee lo que está pasando en el mundo. Los NPCs viven sus propias vidas...
+              </p>
+              <button onclick="refreshWorldEvents()" style="padding: 8px 15px; margin-bottom: 10px;">🔄 Refrescar</button>
+              <div id="worldEventsFeed" style="max-height: 500px; overflow-y: auto; font-size: 11px;">
+                <p style="text-align: center; color: #888; padding: 20px;">
+                  ⏳ Cargando eventos del mundo...
+                </p>
+              </div>
+            </div>
+
+            <!-- Relaciones Intensas -->
+            <div class="panel">
+              <h2>💕 RELACIONES DRAMÁTICAS</h2>
+              <p style="font-size: 11px; color: #888; margin-bottom: 10px;">
+                NPCs con relaciones intensas: amores, odios, rivalidades...
+              </p>
+              <div id="intenseRelationships" style="max-height: 300px; overflow-y: auto; font-size: 11px;">
+                <p style="color: #888;">Sin relaciones dramáticas...</p>
+              </div>
+            </div>
+
+            <!-- Estadísticas del Mundo -->
+            <div class="panel">
+              <h2>🌍 ESTADO DEL MUNDO</h2>
+              <div id="worldStats" style="font-size: 11px;">
+                <p style="color: #888;">Cargando...</p>
+              </div>
+            </div>
+
+            <!-- Acciones Autónomas de NPCs (IA) -->
+            <div class="panel" style="grid-column: 1 / -1;">
+              <h2>🤖 ACCIONES AUTÓNOMAS DE NPCs</h2>
+              <p style="font-size: 11px; color: #888; margin-bottom: 10px;">
+                Los NPCs toman decisiones por sí mismos basadas en su personalidad, relaciones y memoria...
+              </p>
+              <div id="npcActionsLog" style="max-height: 350px; overflow-y: auto; font-size: 11px;">
+                <p style="text-align: center; color: #888;">Sin acciones registradas...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 5: PROGRESIÓN -->
         <div id="tab-progression" class="tab-content">
           <div class="container">
             <div class="panel">
@@ -1188,8 +1372,36 @@
       }
     }
     
+    // Sistema de audio para sonidos reales
+    const audioFiles = {};
+    let audioVolume = 0.85;
+
+    function loadAudioFile(name, path) {
+      const audio = new Audio(path);
+      audio.volume = audioVolume;
+      audioFiles[name] = audio;
+    }
+
+    // Cargar archivos de sonido
+    loadAudioFile('npc_saludo', '/sounds/SaludoinicialNpcMale.m4a');
+    loadAudioFile('npc_charla', '/sounds/CharlamediaNpcMale.m4a');
+    loadAudioFile('npc_despedida', '/sounds/DespedidaNpcMale.m4a');
+    loadAudioFile('ataque_melee', '/sounds/AtacoMele.m4a');
+    loadAudioFile('recibo_dano', '/sounds/ReciboDaño.m4a');
+
     function playSound(type) {
-      if (!soundEnabled || !audioContext) return;
+      if (!soundEnabled) return;
+      
+      // Intentar reproducir archivo de audio real primero
+      if (audioFiles[type]) {
+        const audio = audioFiles[type].cloneNode();
+        audio.volume = audioVolume;
+        audio.play().catch(err => console.log('Error reproduciendo sonido:', err));
+        return;
+      }
+
+      // Fallback a tonos sintetizados
+      if (!audioContext) return;
       
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -1392,12 +1604,21 @@
         hideBadge('events');
       } else if (tabName === 'social') {
         hideBadge('social');
+      } else if (tabName === 'missions') {
+        hideBadge('missions');
+        loadNarrativeMissions(); // Cargar misiones narrativas
+      } else if (tabName === 'mundo') {
+        hideBadge('mundo');
+        refreshQuests(); // Refrescar misiones al abrir tab
       }
       
       // Lazy loading: cargar contenido solo la primera vez
       if (!tabsLoaded[tabName]) {
         tabsLoaded[tabName] = true;
         switch(tabName) {
+          case 'missions':
+            loadNarrativeMissions();
+            break;
           case 'crafting':
             renderCrafting();
             break;
@@ -1407,6 +1628,11 @@
           case 'social':
             renderOnlinePlayers([]);
             renderChat();
+            break;
+          case 'mundo':
+            refreshWorldEvents();
+            loadIntenseRelationships();
+            loadWorldStats();
             break;
           case 'progression':
             loadDefaultLeaderboard();
@@ -1420,6 +1646,9 @@
       } else if (tabName === 'progression') {
         // Siempre actualizar leaderboard al abrir
         loadDefaultLeaderboard();
+      } else if (tabName === 'mundo') {
+        // Siempre refrescar datos del mundo al abrir
+        refreshWorldEvents();
       }
     }
 
@@ -1527,6 +1756,825 @@
         cantidad
       }));
     }
+
+    // ====================================
+    // SISTEMA DE MUNDO VIVO
+    // ====================================
+    
+    function refreshWorldEvents() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No conectado al servidor', 'warning');
+        return;
+      }
+      
+      ws.send(JSON.stringify({
+        type: 'getWorldEvents',
+        limit: 50
+      }));
+    }
+
+    function loadIntenseRelationships() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      
+      ws.send(JSON.stringify({
+        type: 'getIntenseRelationships',
+        minIntensity: 5
+      }));
+    }
+
+    function loadWorldStats() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      
+      ws.send(JSON.stringify({
+        type: 'getWorldState'
+      }));
+    }
+
+    function renderWorldEvents(events) {
+      const feed = document.getElementById('worldEventsFeed');
+      if (!feed || !events || events.length === 0) {
+        feed.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">No hay eventos recientes...</p>';
+        return;
+      }
+
+      // Agrupar eventos por tipo para mejor visualización
+      const groupedEvents = {
+        romance: [],
+        conflicto: [],
+        drama: [],
+        actividad: [],
+        otros: []
+      };
+
+      events.forEach(event => {
+        const tipo = event.tipo;
+        if (tipo.includes('romance') || tipo.includes('coqueteo') || tipo.includes('amor') || tipo.includes('tension')) {
+          groupedEvents.romance.push(event);
+        } else if (tipo.includes('pelea') || tipo.includes('conflicto') || tipo.includes('enemigo') || tipo.includes('rival')) {
+          groupedEvents.conflicto.push(event);
+        } else if (tipo.includes('drama') || tipo.includes('chisme') || tipo.includes('celos') || tipo.includes('triangulo')) {
+          groupedEvents.drama.push(event);
+        } else if (tipo.includes('colaboracion') || tipo.includes('charla') || tipo.includes('ayuda') || tipo.includes('amistad')) {
+          groupedEvents.actividad.push(event);
+        } else {
+          groupedEvents.otros.push(event);
+        }
+      });
+
+      let html = '';
+
+      // Mostrar todos los eventos en orden cronológico
+      events.forEach(event => {
+        const timeAgo = getTimeAgo(event.timestamp);
+        const icon = getEventIcon(event.tipo);
+        const color = getEventColor(event.tipo);
+        
+        html += `
+          <div style="background: #1a1a1a; border-left: 3px solid ${color}; padding: 10px; margin: 8px 0; border-radius: 3px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <span style="color: ${color};">${icon} ${event.tipo.toUpperCase()}</span>
+              <span style="color: #666; font-size: 10px;">${timeAgo}</span>
+            </div>
+            <p style="margin: 0; color: #ddd; line-height: 1.4;">
+              ${event.descripcion}
+            </p>
+          </div>
+        `;
+      });
+
+      feed.innerHTML = html;
+    }
+
+    function renderIntenseRelationships(relationships) {
+      const container = document.getElementById('intenseRelationships');
+      if (!container) return;
+
+      if (!relationships || relationships.length === 0) {
+        container.innerHTML = '<p style="color: #888;">Sin relaciones dramáticas...</p>';
+        return;
+      }
+
+      let html = '';
+
+      relationships.forEach(rel => {
+        const estadoIcon = getRelationshipIcon(rel.estado);
+        const color = getRelationshipColor(rel.estado);
+        
+        html += `
+          <div style="background: #1a2a1a; border: 1px solid ${color}; padding: 8px; margin: 5px 0; border-radius: 3px;">
+            <div style="color: ${color}; font-weight: bold; margin-bottom: 3px;">
+              ${estadoIcon} ${rel.npc_a_id} ↔ ${rel.npc_b_id}
+            </div>
+            <div style="font-size: 10px; color: #aaa;">
+              Estado: <span style="color: ${color};">${rel.estado}</span> | 
+              Intensidad: ${'🔥'.repeat(Math.min(rel.intensidad, 10))}
+            </div>
+            <div style="font-size: 9px; color: #888; margin-top: 3px;">
+              Amistad: ${rel.amistad} | Atracción: ${rel.atraccion} | 
+              Rivalidad: ${rel.rivalidad} | Celos: ${rel.celos}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderWorldStats(stats) {
+      const container = document.getElementById('worldStats');
+      if (!container || !stats) return;
+
+      const narrativeStats = stats.narrativeStats || {};
+      const aiStats = stats.aiStats || {};
+      
+      const html = `
+        <div style="background: #1a1a2a; padding: 10px; border-radius: 3px; margin: 5px 0;">
+          <div style="margin: 5px 0;">⏱️ <strong>Tick:</strong> #${stats.tick || 0}</div>
+          <div style="margin: 5px 0;">👥 <strong>NPCs Activos:</strong> ${stats.npcCount || 0}</div>
+          <div style="margin: 5px 0;">⚡ <strong>Eventos Activos:</strong> ${stats.activeEvents || 0}</div>
+        </div>
+        
+        <div style="background: #2a1a1a; padding: 10px; border-radius: 3px; margin: 10px 0;">
+          <div style="font-weight: bold; margin-bottom: 5px; color: #ff88aa;">📊 Estadísticas Narrativas</div>
+          <div style="margin: 3px 0;">💕 Romances: ${narrativeStats.romances || 0}</div>
+          <div style="margin: 3px 0;">⚔️ Conflictos: ${narrativeStats.conflictos || 0}</div>
+          <div style="margin: 3px 0;">🎭 Dramas: ${narrativeStats.dramas || 0}</div>
+          <div style="margin: 3px 0;">🤝 Actividades: ${narrativeStats.actividades || 0}</div>
+        </div>
+        
+        <div style="background: #1a2a1a; padding: 10px; border-radius: 3px; margin: 10px 0;">
+          <div style="font-weight: bold; margin-bottom: 5px; color: #44ff88;">🤖 Sistema de IA</div>
+          <div style="margin: 3px 0;">🧠 NPCs con memoria: ${aiStats.npcsWithMemories || 0}</div>
+          <div style="margin: 3px 0;">💭 Recuerdos totales: ${aiStats.totalMemories || 0}</div>
+          <div style="margin: 3px 0;">🎯 Objetivos activos: ${aiStats.activeGoals || 0}</div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    // Helpers para iconos y colores
+    function getEventIcon(tipo) {
+      if (tipo.includes('romance') || tipo.includes('amor')) return '💕';
+      if (tipo.includes('pelea') || tipo.includes('conflicto')) return '⚔️';
+      if (tipo.includes('drama') || tipo.includes('chisme')) return '🎭';
+      if (tipo.includes('amistad') || tipo.includes('ayuda')) return '🤝';
+      if (tipo.includes('coqueteo')) return '😊';
+      if (tipo.includes('tension')) return '🔥';
+      if (tipo.includes('celos')) return '😒';
+      return '📰';
+    }
+
+    function getEventColor(tipo) {
+      if (tipo.includes('romance') || tipo.includes('amor')) return '#ff88aa';
+      if (tipo.includes('pelea') || tipo.includes('conflicto')) return '#ff4444';
+      if (tipo.includes('drama') || tipo.includes('chisme')) return '#ff8800';
+      if (tipo.includes('amistad') || tipo.includes('ayuda')) return '#44ff44';
+      if (tipo.includes('coqueteo')) return '#ffaa88';
+      if (tipo.includes('tension')) return '#ffaa00';
+      if (tipo.includes('celos')) return '#aa00aa';
+      return '#888888';
+    }
+
+    function getRelationshipIcon(estado) {
+      switch(estado) {
+        case 'amantes': return '💑';
+        case 'tension_sexual': return '🔥';
+        case 'enemigos': return '⚔️';
+        case 'rivales': return '🥊';
+        case 'amigos': return '🤝';
+        case 'celoso': return '😒';
+        case 'complejo': return '🎭';
+        default: return '👥';
+      }
+    }
+
+    function getRelationshipColor(estado) {
+      switch(estado) {
+        case 'amantes': return '#ff4488';
+        case 'tension_sexual': return '#ff8800';
+        case 'enemigos': return '#ff0000';
+        case 'rivales': return '#ffaa00';
+        case 'amigos': return '#44ff44';
+        case 'celoso': return '#aa00aa';
+        case 'complejo': return '#8888ff';
+        default: return '#888888';
+      }
+    }
+
+    function getTimeAgo(timestamp) {
+      const seconds = Math.floor((Date.now() - timestamp) / 1000);
+      if (seconds < 60) return `hace ${seconds}s`;
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `hace ${minutes}m`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `hace ${hours}h`;
+      const days = Math.floor(hours / 24);
+      return `hace ${days}d`;
+    }
+
+    // Renderizar acciones autónomas de NPCs
+    function renderNpcActions(actions) {
+      const container = document.getElementById('npcActionsLog');
+      
+      if (!actions || actions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #888;">Sin acciones registradas...</p>';
+        return;
+      }
+
+      const actionsHTML = actions.map(action => {
+        const icon = getActionIcon(action.action);
+        const color = getActionColor(action.action);
+        
+        return `
+          <div style="
+            background: rgba(0,0,0,0.4);
+            border-left: 3px solid ${color};
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+          ">
+            <div style="color: ${color}; font-weight: bold; margin-bottom: 4px;">
+              ${icon} ${action.action.toUpperCase().replace('_', ' ')}
+            </div>
+            <div style="color: #ccc;">
+              ${action.description}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = actionsHTML;
+    }
+
+    function getActionIcon(actionType) {
+      const icons = {
+        'move': '🚶',
+        'interact': '💬',
+        'seek_romance': '💕',
+        'avoid_enemy': '🏃',
+        'seek_friend': '🤝',
+        'confront': '⚔️',
+        'rest': '😴'
+      };
+      return icons[actionType] || '🎯';
+    }
+
+    function getActionColor(actionType) {
+      const colors = {
+        'move': '#4488ff',
+        'interact': '#44ff44',
+        'seek_romance': '#ff4488',
+        'avoid_enemy': '#ffaa00',
+        'seek_friend': '#44ff88',
+        'confront': '#ff4444',
+        'rest': '#8888ff'
+      };
+      return colors[actionType] || '#888888';
+    }
+
+    // ====================================
+    // SISTEMA DE MISIONES DINÁMICAS
+    // ====================================
+    
+    function refreshQuests() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ type: 'getActiveQuests' }));
+    }
+    
+    function renderQuests(quests) {
+      const list = document.getElementById('questsList');
+      const badge = document.getElementById('questCountBadge');
+      
+      if (!quests || quests.length === 0) {
+        list.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">No hay misiones disponibles.</p>';
+        badge.textContent = '';
+        return;
+      }
+      
+      badge.textContent = `(${quests.length})`;
+      
+      const questsHTML = quests.map(quest => {
+        const timeLeft = quest.expiresAt - Date.now();
+        const minutesLeft = Math.floor(timeLeft / 60000);
+        const isExpiringSoon = minutesLeft < 3;
+        
+        const typeIcons = {
+          'romance': '💕',
+          'matchmaker': '💘',
+          'mediation': '🕊️',
+          'rivalry': '⚔️',
+          'jealousy': '😒',
+          'investigation': '🔍'
+        };
+        
+        const typeColors = {
+          'romance': '#ff4488',
+          'matchmaker': '#ff88cc',
+          'mediation': '#44ff44',
+          'rivalry': '#ffaa00',
+          'jealousy': '#aa00aa',
+          'investigation': '#4488ff'
+        };
+        
+        const icon = typeIcons[quest.type] || '⚡';
+        const color = typeColors[quest.type] || '#888';
+        const isAccepted = quest.estado === 'aceptada';
+        
+        return `
+          <div class="quest-card" style="
+            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(30,30,30,0.9) 100%);
+            border: 2px solid ${color};
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            ${isExpiringSoon ? 'animation: pulse 1s infinite;' : ''}
+          ">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+              <h3 style="margin: 0; color: ${color}; font-size: 14px;">
+                ${icon} ${quest.title}
+              </h3>
+              <span style="
+                background: ${isExpiringSoon ? '#ff0000' : '#333'};
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: bold;
+              ">
+                ⏱️ ${minutesLeft}m
+              </span>
+            </div>
+            
+            <p style="font-size: 11px; color: #ccc; margin: 10px 0; line-height: 1.4;">
+              ${quest.description}
+            </p>
+            
+            <div style="margin: 10px 0;">
+              <strong style="color: ${color}; font-size: 11px;">OBJETIVOS:</strong>
+              <ul style="margin: 5px 0; padding-left: 20px; font-size: 10px; color: #aaa;">
+                ${quest.objectives.map(obj => `<li>${obj}</li>`).join('')}
+              </ul>
+            </div>
+            
+            <div style="margin: 10px 0;">
+              <strong style="color: #ffaa00; font-size: 11px;">RECOMPENSAS:</strong>
+              <div style="font-size: 10px; color: #ffcc00; margin-top: 5px;">
+                ${quest.rewards.xp ? `⭐ +${quest.rewards.xp} XP` : ''}
+                ${quest.rewards.reputacion ? `📊 +${quest.rewards.reputacion} Rep` : ''}
+                ${quest.rewards.oro ? `💰 +${quest.rewards.oro} Oro` : ''}
+              </div>
+            </div>
+            
+            <div style="margin: 10px 0; font-size: 10px; color: #888;">
+              NPCs: ${quest.npcsInvolved.map(npc => `<span style="color: #fff;">${npc.nombre}</span>`).join(', ')}
+            </div>
+            
+            ${isAccepted ? `
+              <button onclick="completeQuest('${quest.id}', true)" style="
+                background: #44ff44;
+                color: #000;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                margin-right: 5px;
+              ">✅ COMPLETAR</button>
+              <button onclick="completeQuest('${quest.id}', false)" style="
+                background: #ff4444;
+                color: #fff;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+              ">❌ FALLAR</button>
+            ` : `
+              <button onclick="acceptQuest('${quest.id}')" style="
+                background: ${color};
+                color: #fff;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                width: 100%;
+              ">🎯 ACEPTAR MISIÓN</button>
+            `}
+          </div>
+        `;
+      }).join('');
+      
+      list.innerHTML = questsHTML;
+    }
+    
+    function acceptQuest(questId) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No hay conexión con el servidor', 'warning');
+        return;
+      }
+      
+      ws.send(JSON.stringify({
+        type: 'acceptQuest',
+        questId
+      }));
+    }
+    
+    function completeQuest(questId, success) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No hay conexión con el servidor', 'warning');
+        return;
+      }
+      
+      const confirmMsg = success 
+        ? '¿Completaste los objetivos de la misión?' 
+        : '¿Quieres marcar la misión como fallida?';
+      
+      if (confirm(confirmMsg)) {
+        ws.send(JSON.stringify({
+          type: 'completeQuest',
+          questId,
+          success
+        }));
+      }
+    }
+
+    // ====================================
+    // FIN SISTEMA DE MISIONES DINÁMICAS
+    // ====================================
+
+    // ====================================
+    // SISTEMA DE MISIONES NARRATIVAS
+    // ====================================
+
+    let currentNarrativeMission = null;
+    let narrativeTimer = null;
+    let narrativeTimeLeft = 0;
+
+    // Cargar misiones disponibles
+    function loadNarrativeMissions() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No hay conexión con el servidor', 'warning');
+        return;
+      }
+
+      ws.send(JSON.stringify({ type: 'getNarrativeMissions' }));
+    }
+
+    // Renderizar lista de misiones
+    function renderNarrativeMissions(missions) {
+      const container = document.getElementById('narrativeMissionCards');
+      
+      if (!missions || missions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #888;">No hay misiones disponibles para tu nivel.</p>';
+        return;
+      }
+
+      const missionsHTML = missions.map(mission => {
+        return `
+          <div class="mission-card" style="
+            background: linear-gradient(135deg, #1a1a2a 0%, #2a1a2a 100%);
+            border: 2px solid #ffaa00;
+            border-radius: 8px;
+            padding: 15px;
+          ">
+            <h3 style="color: #ffaa00; margin-bottom: 10px;">${mission.title}</h3>
+            <p style="font-size: 11px; color: #ccc; margin-bottom: 10px; line-height: 1.4;">
+              ${mission.description}
+            </p>
+            
+            <div style="font-size: 10px; color: #888; margin: 5px 0;">
+              📊 Nivel mínimo: ${mission.minLevel}
+            </div>
+            <div style="font-size: 10px; color: #888; margin: 5px 0;">
+              👥 Máximo jugadores: ${mission.maxPartySize}
+            </div>
+            <div style="font-size: 10px; color: #888; margin: 5px 0;">
+              ⏱️ Duración estimada: ${mission.estimatedTime}
+            </div>
+
+            <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 4px;">
+              <div style="font-weight: bold; color: #ffaa00; margin-bottom: 5px;">🎁 Recompensas</div>
+              <div style="font-size: 10px; color: #ffcc00;">
+                👤 Solo: ${mission.rewards.solo.xp} XP + ${Object.entries(mission.rewards.solo.items).map(([k,v]) => `${v} ${k}`).join(', ')}
+              </div>
+              <div style="font-size: 10px; color: #88ff88;">
+                👥 Grupo: ${mission.rewards.group.xp} XP + ${Object.entries(mission.rewards.group.items).map(([k,v]) => `${v} ${k}`).join(', ')}
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+              <button onclick="startNarrativeMission('${mission.id}', false)" style="
+                flex: 1;
+                background: #4444ff;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+              ">
+                👤 INICIAR SOLO
+              </button>
+              <button onclick="startNarrativeMission('${mission.id}', true)" style="
+                flex: 1;
+                background: #44ff44;
+                color: #000;
+                border: none;
+                padding: 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+              ">
+                👥 INICIAR EN GRUPO
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = missionsHTML;
+    }
+
+    // Iniciar misión narrativa
+    function startNarrativeMission(templateId, isGroup) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No hay conexión con el servidor', 'warning');
+        return;
+      }
+
+      // Si es grupo, obtener miembros del partido
+      let partyMembers = [player.id];
+      
+      if (isGroup) {
+        // TODO: Implementar selector de grupo
+        // Por ahora, solo jugador
+        if (!confirm('¿Iniciar misión en modo GRUPO? (Actualmente solo tú)')) {
+          return;
+        }
+      }
+
+      ws.send(JSON.stringify({
+        type: 'startNarrativeMission',
+        templateId,
+        isGroup,
+        partyMembers
+      }));
+    }
+
+    // Mostrar misión en curso
+    function showNarrativeMission(mission) {
+      currentNarrativeMission = mission;
+
+      // Ocultar lista, mostrar misión activa
+      document.getElementById('narrativeMissionList').style.display = 'none';
+      document.getElementById('narrativeMissionActive').style.display = 'block';
+
+      // Título
+      document.getElementById('narrativeMissionTitle').textContent = `📖 ${mission.title}`;
+
+      // Modo
+      const modeDiv = document.getElementById('narrativeMode');
+      if (mission.isGroup) {
+        modeDiv.innerHTML = `👥 GRUPO (${mission.partyMembers.length})`;
+        modeDiv.style.background = '#44ff44';
+        modeDiv.style.color = '#000';
+      } else {
+        modeDiv.innerHTML = '👤 SOLO';
+        modeDiv.style.background = '#4444ff';
+      }
+
+      // Mostrar paso actual
+      if (mission.currentStep) {
+        showNarrativeStep(mission.currentStep);
+      }
+    }
+
+    // Mostrar paso narrativo
+    function showNarrativeStep(step) {
+      // Texto narrativo
+      document.getElementById('narrativeStoryText').innerHTML = step.text;
+
+      // Timer
+      narrativeTimeLeft = step.timer || 30;
+      updateNarrativeTimer();
+      
+      // Reiniciar timer
+      if (narrativeTimer) clearInterval(narrativeTimer);
+      narrativeTimer = setInterval(() => {
+        narrativeTimeLeft--;
+        updateNarrativeTimer();
+        
+        if (narrativeTimeLeft <= 0) {
+          clearInterval(narrativeTimer);
+          // Auto-seleccionar opción aleatoria
+          autoSelectNarrativeChoice();
+        }
+      }, 1000);
+
+      // Estilo del timer según urgencia
+      const timerDiv = document.getElementById('narrativeTimer');
+      if (step.critical) {
+        timerDiv.style.background = '#ff0000';
+        timerDiv.style.animation = 'pulse 0.5s infinite';
+      } else if (step.danger) {
+        timerDiv.style.background = '#ff6600';
+      } else {
+        timerDiv.style.background = '#ff4444';
+        timerDiv.style.animation = 'none';
+      }
+
+      // Votación (si es grupo)
+      if (currentNarrativeMission.isGroup) {
+        document.getElementById('narrativeVoting').style.display = 'block';
+        document.getElementById('voteCount').textContent = `Votos: 0 / ${currentNarrativeMission.partyMembers.length}`;
+      } else {
+        document.getElementById('narrativeVoting').style.display = 'none';
+      }
+
+      // Opciones
+      renderNarrativeChoices(step.choices);
+    }
+
+    // Actualizar timer
+    function updateNarrativeTimer() {
+      document.getElementById('narrativeTimer').textContent = `⏱️ ${narrativeTimeLeft}s`;
+    }
+
+    // Renderizar opciones
+    function renderNarrativeChoices(choices) {
+      const container = document.getElementById('narrativeChoices');
+      
+      const choicesHTML = choices.map(choice => {
+        return `
+          <button onclick="makeNarrativeChoice('${choice.id}')" class="narrative-choice-btn" style="
+            background: linear-gradient(135deg, #2a2a4a 0%, #3a2a4a 100%);
+            border: 2px solid #ffaa00;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: left;
+            color: white;
+            font-size: 13px;
+            transition: all 0.3s;
+          " onmouseover="this.style.borderColor='#ffff00'; this.style.transform='scale(1.05)'" onmouseout="this.style.borderColor='#ffaa00'; this.style.transform='scale(1)'">
+            ${choice.text}
+          </button>
+        `;
+      }).join('');
+
+      container.innerHTML = choicesHTML;
+    }
+
+    // Hacer elección
+    function makeNarrativeChoice(choiceId) {
+      if (!currentNarrativeMission) return;
+
+      // Detener timer
+      if (narrativeTimer) {
+        clearInterval(narrativeTimer);
+        narrativeTimer = null;
+      }
+
+      // Enviar elección
+      if (currentNarrativeMission.isGroup) {
+        // Votar
+        ws.send(JSON.stringify({
+          type: 'narrativeVote',
+          missionId: currentNarrativeMission.id,
+          choiceId
+        }));
+
+        log('✅ Voto registrado. Esperando a los demás...', 'info');
+      } else {
+        // Elección directa
+        ws.send(JSON.stringify({
+          type: 'narrativeChoice',
+          missionId: currentNarrativeMission.id,
+          choiceId
+        }));
+      }
+
+      // Deshabilitar botones
+      document.querySelectorAll('.narrative-choice-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      });
+    }
+
+    // Auto-seleccionar si se acaba el tiempo
+    function autoSelectNarrativeChoice() {
+      if (!currentNarrativeMission) return;
+      
+      const step = currentNarrativeMission.currentStep;
+      if (step && step.choices && step.choices.length > 0) {
+        // Elegir la última opción (generalmente la más segura/cobarde)
+        const lastChoice = step.choices[step.choices.length - 1];
+        log('⏰ ¡Tiempo agotado! Elección automática...', 'warning');
+        makeNarrativeChoice(lastChoice.id);
+      }
+    }
+
+    // Abandonar misión
+    function abandonNarrativeMission() {
+      if (!confirm('¿Seguro que quieres abandonar la misión?')) return;
+
+      currentNarrativeMission = null;
+      if (narrativeTimer) {
+        clearInterval(narrativeTimer);
+        narrativeTimer = null;
+      }
+
+      document.getElementById('narrativeMissionActive').style.display = 'none';
+      document.getElementById('narrativeMissionList').style.display = 'block';
+
+      log('Misión abandonada', 'warning');
+    }
+
+    // Mostrar completado
+    function showNarrativeMissionCompleted(rewards, summary) {
+      if (narrativeTimer) {
+        clearInterval(narrativeTimer);
+        narrativeTimer = null;
+      }
+
+      playSound('achievement');
+
+      let summaryHTML = `
+        <div style="
+          background: linear-gradient(135deg, #1a4a1a 0%, #2a5a2a 100%);
+          border: 3px solid #44ff44;
+          border-radius: 12px;
+          padding: 25px;
+          text-align: center;
+        ">
+          <h2 style="color: #44ff44; font-size: 24px; margin-bottom: 15px;">
+            ✅ ¡MISIÓN COMPLETADA!
+          </h2>
+          
+          <div style="font-size: 18px; margin: 10px 0;">
+            ${summary.title}
+          </div>
+          
+          <div style="display: flex; justify-content: center; gap: 30px; margin: 20px 0; font-size: 14px;">
+            <div>⏱️ ${summary.duration}</div>
+            <div>${summary.mode === 'Grupo' ? '👥' : '👤'} ${summary.mode}</div>
+            <div>🧟 ${summary.kills} Kills</div>
+          </div>
+
+          <div style="
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+          ">
+            <div style="font-size: 16px; color: #ffaa00; margin-bottom: 10px;">🎁 RECOMPENSAS</div>
+            <div style="font-size: 14px;">
+              ⭐ +${rewards.xp} XP<br>
+              ❤️ ${rewards.health > 0 ? '+' : ''}${rewards.health} Salud<br>
+              🎒 ${Object.entries(rewards.items).map(([k,v]) => `${v} ${k}`).join(', ')}
+            </div>
+          </div>
+
+          <button onclick="closeNarrativeMissionComplete()" style="
+            background: #44ff44;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 15px;
+          ">
+            ✅ CONTINUAR
+          </button>
+        </div>
+      `;
+
+      document.getElementById('narrativeStoryText').innerHTML = summaryHTML;
+      document.getElementById('narrativeChoices').innerHTML = '';
+      document.getElementById('narrativeTimer').style.display = 'none';
+    }
+
+    function closeNarrativeMissionComplete() {
+      currentNarrativeMission = null;
+      document.getElementById('narrativeMissionActive').style.display = 'none';
+      document.getElementById('narrativeMissionList').style.display = 'block';
+      document.getElementById('narrativeTimer').style.display = 'block';
+      
+      loadNarrativeMissions();
+      renderGame();
+    }
+
+    // ====================================
+    // FIN SISTEMA DE MISIONES NARRATIVAS
+    // ====================================
+
+    // ====================================
+    // FIN SISTEMA DE MUNDO VIVO
+    // ====================================
 
     function rest() {
       if (!player) return;
@@ -1688,6 +2736,9 @@
       },
       
       'combat:result': (msg) => {
+        // Reproducir sonido si viene en el mensaje
+        if (msg.playSound) playSound(msg.playSound);
+        
         let combatMsg = `⚔️ Eliminaste ${msg.killed} zombies`;
         if (msg.critico) combatMsg += ' ¡CRÍTICO!';
         if (msg.falloSigilo) combatMsg = '🚫 Fallo de sigilo! Te detectaron y te hirieron.';
@@ -1847,6 +2898,99 @@
         }
       },
       
+      // ===== MUNDO VIVO =====
+      'world:events': (msg) => {
+        renderWorldEvents(msg.events);
+        // Badge si hay nuevos eventos y no está en el tab
+        const mundoTab = document.getElementById('tab-mundo');
+        if (mundoTab && !mundoTab.classList.contains('active') && msg.events && msg.events.length > 0) {
+          showBadge('mundo');
+        }
+      },
+      
+      'world:relationships': (msg) => {
+        renderIntenseRelationships(msg.relationships);
+      },
+      
+      'world:fullState': (msg) => {
+        renderWorldStats(msg.state);
+        
+        // Renderizar acciones de NPCs si hay
+        if (msg.state.recentNpcActions) {
+          renderNpcActions(msg.state.recentNpcActions);
+        }
+      },
+      
+      'quests:list': (msg) => {
+        renderQuests(msg.quests);
+      },
+      
+      'quest:accepted': (msg) => {
+        log(`✅ Misión aceptada: ${msg.quest.title}`, 'success');
+        playSound('achievement');
+        refreshQuests();
+      },
+      
+      'quest:completed': (msg) => {
+        log(msg.result.message, 'success');
+        if (msg.result.rewards) {
+          const r = msg.result.rewards;
+          const rewards = [];
+          if (r.xp) rewards.push(`+${r.xp} XP`);
+          if (r.reputacion) rewards.push(`+${r.reputacion} Reputación`);
+          if (r.oro) rewards.push(`+${r.oro} Oro`);
+          log(`🎁 Recompensas: ${rewards.join(', ')}`, 'success');
+        }
+        player = { ...player, ...msg.player };
+        playSound('achievement');
+        renderGame();
+        refreshQuests();
+      },
+      
+      // ===== MISIONES NARRATIVAS =====
+      'narrative:missions': (msg) => {
+        renderNarrativeMissions(msg.missions);
+      },
+      
+      'narrative:started': (msg) => {
+        log(`📖 Misión iniciada: ${msg.mission.title}`, 'success');
+        showNarrativeMission(msg.mission);
+        playSound('achievement');
+      },
+      
+      'narrative:nextStep': (msg) => {
+        if (msg.effects) {
+          // Mostrar efectos brevemente
+          if (msg.effects.damage) {
+            log(`💔 Recibiste daño: ${msg.effects.damage}`, 'combat');
+          }
+          if (msg.effects.loot) {
+            log(`🎒 Conseguiste items`, 'success');
+          }
+        }
+        
+        // Mostrar siguiente paso
+        setTimeout(() => {
+          showNarrativeStep(msg.step);
+        }, 500);
+      },
+      
+      'narrative:completed': (msg) => {
+        log(`✅ ¡Misión completada!`, 'success');
+        showNarrativeMissionCompleted(msg.rewards, msg.summary);
+      },
+      
+      'narrative:voted': (msg) => {
+        document.getElementById('voteCount').textContent = `Votos: ${msg.votesCount} / ${msg.totalMembers}`;
+        log(`✅ Voto registrado (${msg.votesCount}/${msg.totalMembers})`, 'info');
+      },
+      
+      'narrative:active': (msg) => {
+        if (msg.mission) {
+          showNarrativeMission(msg.mission);
+        }
+      },
+      
       'error': (msg) => {
         log(`ERROR: ${msg.error}`, 'warning');
       }
@@ -1921,6 +3065,11 @@
           break;
           
         case 'dialogue':
+          // Reproducir sonido de saludo inicial o de charla
+          if (msg.playSound) {
+            playSound(msg.playSound);
+          }
+          
           log(`${msg.npc}: "${msg.text}"`, '');
           
           // Actualizar panel de diálogo interactivo

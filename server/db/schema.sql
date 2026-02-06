@@ -643,3 +643,55 @@ INSERT OR IGNORE INTO shops (npc_id, nombre, tipo, inventario, descuento_reputac
   {"item_id": "item_vitaminas", "cantidad": 10, "precio_compra": 40, "precio_venta": 20}
 ]', 0.10);
 
+-- ========================================
+-- SISTEMA DE MUNDO VIVO - Red Dead Redemption Style
+-- ========================================
+
+-- Tabla de eventos del mundo (feed de noticias)
+CREATE TABLE IF NOT EXISTS world_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp INTEGER NOT NULL,
+    tipo TEXT NOT NULL, -- romance, pelea, drama, actividad, etc
+    descripcion TEXT NOT NULL,
+    npcs_involucrados TEXT, -- JSON array de NPC IDs
+    location_id TEXT,
+    intensidad INTEGER DEFAULT 1,
+    leido_por TEXT DEFAULT '[]', -- JSON array de player IDs que ya lo vieron
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_world_events_timestamp ON world_events(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_world_events_tipo ON world_events(tipo);
+
+-- Tabla de relaciones entre NPCs (sistema avanzado)
+-- Nota: Ya creada dinámicamente en npcRelations.js, pero la definimos aquí también
+CREATE TABLE IF NOT EXISTS npc_relationships (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_a_id TEXT NOT NULL,
+    npc_b_id TEXT NOT NULL,
+    
+    -- DIMENSIONES DE RELACIÓN (0-100)
+    amistad INTEGER DEFAULT 50,
+    atraccion INTEGER DEFAULT 0,
+    respeto INTEGER DEFAULT 50,
+    rivalidad INTEGER DEFAULT 0,
+    celos INTEGER DEFAULT 0,
+    
+    -- ESTADO DE LA RELACIÓN
+    estado TEXT DEFAULT 'neutral',
+    historia TEXT DEFAULT '[]',
+    
+    -- METADATOS
+    ultima_interaccion INTEGER,
+    intensidad INTEGER DEFAULT 1,
+    
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(npc_a_id, npc_b_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_npc_rel_a ON npc_relationships(npc_a_id);
+CREATE INDEX IF NOT EXISTS idx_npc_rel_b ON npc_relationships(npc_b_id);
+CREATE INDEX IF NOT EXISTS idx_npc_rel_estado ON npc_relationships(estado);
+CREATE INDEX IF NOT EXISTS idx_npc_rel_intensidad ON npc_relationships(intensidad DESC);

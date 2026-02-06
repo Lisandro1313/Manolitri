@@ -2208,7 +2208,7 @@ wss.on('connection', (ws) => {
         }
     });
 
-    ws.on('message', (data) => {
+    ws.on('message', async (data) => {
         const msg = JSON.parse(data);
 
         // LOGIN
@@ -2640,6 +2640,7 @@ wss.on('connection', (ws) => {
             else if (tipoAtaque === 'melee') {
                 // Daño = fuerza + skill
                 resultado.danio = 15 + player.atributos.fuerza + Math.floor(player.skills.combate * 2);
+                resultado.playSound = 'ataque_melee'; // Sonido de ataque cuerpo a cuerpo
                 resultado.ruido = 20;
 
                 // Chance de crítico
@@ -2661,6 +2662,7 @@ wss.on('connection', (ws) => {
                     player.salud = Math.max(0, player.salud - 15);
                     ws.send(JSON.stringify({
                         type: 'combat:result',
+                        playSound: 'recibo_dano', // Sonido de recibir daño
                         killed: 0,
                         critico: false,
                         falloSigilo: true,
@@ -2711,6 +2713,7 @@ wss.on('connection', (ws) => {
                 type: 'combat:result',
                 killed: resultado.killed,
                 critico: resultado.critico,
+                playSound: resultado.playSound || null,
                 remaining: loc.zombies,
                 loot: resultado.loot,
                 tipoAtaque,
@@ -2839,6 +2842,335 @@ wss.on('connection', (ws) => {
 
             return;
         }
+
+        // ===== SISTEMA DE MUNDO VIVO =====
+
+        // OBTENER EVENTOS DEL MUNDO (Feed de noticias)
+        if (msg.type === 'getWorldEvents') {
+            try {
+                const narrativeEngine = await import('./world/narrativeEngine.js');
+                const limit = msg.limit || 30;
+                const events = narrativeEngine.default.getRecentEvents(limit);
+
+                ws.send(JSON.stringify({
+                    type: 'world:events',
+                    events: events.reverse() // Más recientes al final
+                }));
+            } catch (error) {
+                console.error('Error obteniendo eventos del mundo:', error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    error: 'No se pudieron obtener los eventos del mundo'
+                }));
+            }
+            return;
+        }
+
+        // OBTENER RELACIONES INTENSAS (dramas activos)
+        if (msg.type === 'getIntenseRelationships') {
+            try {
+                const npcRelationships = await import('./world/npcRelations.js');
+                const minIntensity = msg.minIntensity || 5;
+                const relationships = npcRelationships.default.getIntenseRelationships(minIntensity);
+
+                ws.send(JSON.stringify({
+                    type: 'world:relationships',
+                    relationships
+                }));
+            } catch (error) {
+                console.error('Error obteniendo relaciones:', error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    error: 'No se pudieron obtener las relaciones'
+                }));
+            }
+            return;
+        }
+
+        // OBTENER ESTADO DEL MUNDO (stats de simulación)
+        if (msg.type === 'getWorldState') {
+            try {
+                const worldSimulation = await import('./world/simulation.js');
+                const state = worldSimulation.default.getWorldState();
+
+                ws.send(JSON.stringify({
+                    type: 'world:fullState',
+                    state
+                }));
+            } catch (error) {
+                console.error('Error obteniendo estado del mundo:', error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    error: 'No se pudo obtener el estado del mundo'
+                }));
+            }
+            return;
+        }
+
+        // ===== FIN SISTEMA DE MUNDO VIVO =====
+
+        // OBTENER MISIONES ACTIVAS (quests dinámicas)
+        if (msg.type === 'getActiveQuests') {
+            try {
+                const dynamicQuests = await import('./world/dynamicQuests.js');
+                const quests = dynamicQuests.default.getActiveQuests();
+
+                ws.send(JSON.stringify({
+                    type: 'quests:list',
+                    quests
+                }));
+            } catch (error) {
+                console.error('Error obteniendo misiones:', error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    error: 'No se pudieron obtener las misiones'
+                }));
+            }
+            return;
+        }
+
+        // ACEPTAR MISIÓN
+        if (msg.type === 'acceptQuest') {
+            try {
+                const dynamicQuests = await import('./world/dynamicQuests.js');
+                const questId = msg.questId;
+
+                const quest = dynamicQuests.default.getQuestById(questId);
+                if (!quest) {
+                    ws.send(JSON.stringify({ type: 'error', error: 'Misión no encontrada' }));
+                    return;
+                }
+
+                if (quest.estado !== 'disponible') {
+                    ws.send(JSON.stringify({ type: 'error', error: 'Misión no disponible' }));
+                    return;
+                }
+
+                dynamicQuests.default.acceptQuest(questId, player.id);
+
+                ws.send(JSON.stringify({
+                    type: 'quest:accepted',
+                    quest: dynamicQuests.default.getQuestById(questId)
+                }));
+            } catch (error) {
+                console.error('Error aceptando misión:', error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    error: 'No se pudo aceptar la misión'
+                }));
+            }
+            return;
+        }
+
+        // COMPLETAR MISIÓN
+        if (msg.type === 'completeQuest') {
+            try {
+                const dynamicQuests = await import('./world/dynamicQuests.js');
+                const questId = msg.questId;
+                const success = msg.success !== undefined ? msg.success : true;
+
+                const result = dynamicQuests.default.completeQuest(questId, player.id, success);
+
+                if (!result.success) {
+                    ws.send(JSON.stringify({ type: 'error', error: result.message }));
+                    return;
+                }
+
+                // Aplicar recompensas
+                if (result.rewards) {
+                    if (result.rewards.xp) {
+                        player.xp = (player.xp || 0) + result.rewards.xp;
+                    }
+                    if (result.rewards.reputacion) {
+                        player.reputacion = (player.reputacion || 0) + result.rewards.reputacion;
+                    }
+                    if (result.rewards.oro) {
+                        player.inventario.oro = (player.inventario.oro || 0) + result.rewards.oro;
+                    }
+
+                    guardarPlayer(player.id);
+                }
+
+                ws.send(JSON.stringify({
+                    type: 'quest:completed',
+                    result,
+                    player: {
+                        xp: player.xp,
+                        reputacion: player.reputacion,
+                        inventario: player.inventario
+                    }
+                }));
+            } catch (error) {
+                console.error('Error completando misión:', error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    error: 'No se pudo completar la misión'
+                }));
+            }
+            return;
+        }
+
+        // ===== SISTEMA DE MISIONES NARRATIVAS =====
+
+        // OBTENER MISIONES NARRATIVAS DISPONIBLES
+        if (msg.type === 'getNarrativeMissions') {
+            try {
+                const narrativeMissions = await import('./systems/narrativeMissions.js');
+                const playerLevel = player.nivel || 1;
+                const missions = narrativeMissions.default.getAvailableMissions(playerLevel);
+
+                ws.send(JSON.stringify({
+                    type: 'narrative:missions',
+                    missions
+                }));
+            } catch (error) {
+                console.error('Error obteniendo misiones narrativas:', error);
+                ws.send(JSON.stringify({ type: 'error', error: 'Error cargando misiones' }));
+            }
+            return;
+        }
+
+        // INICIAR MISIÓN NARRATIVA
+        if (msg.type === 'startNarrativeMission') {
+            try {
+                const narrativeMissions = await import('./systems/narrativeMissions.js');
+                const { templateId, isGroup, partyMembers } = msg;
+
+                const result = narrativeMissions.default.startMission(
+                    templateId,
+                    player.id,
+                    isGroup,
+                    partyMembers || []
+                );
+
+                if (result.success) {
+                    // Notificar a todos los miembros del grupo
+                    if (isGroup && partyMembers) {
+                        partyMembers.forEach(memberId => {
+                            const memberWs = wss.clients.find(c => c.playerId === memberId);
+                            if (memberWs) {
+                                memberWs.send(JSON.stringify({
+                                    type: 'narrative:started',
+                                    mission: result.mission
+                                }));
+                            }
+                        });
+                    }
+
+                    ws.send(JSON.stringify({
+                        type: 'narrative:started',
+                        mission: result.mission
+                    }));
+                } else {
+                    ws.send(JSON.stringify({ type: 'error', error: result.message }));
+                }
+            } catch (error) {
+                console.error('Error iniciando misión narrativa:', error);
+                ws.send(JSON.stringify({ type: 'error', error: 'Error al iniciar misión' }));
+            }
+            return;
+        }
+
+        // HACER ELECCIÓN EN MISIÓN (SOLO)
+        if (msg.type === 'narrativeChoice') {
+            try {
+                const narrativeMissions = await import('./systems/narrativeMissions.js');
+                const { missionId, choiceId } = msg;
+
+                const result = narrativeMissions.default.makeChoice(missionId, player.id, choiceId);
+
+                if (result.success) {
+                    if (result.completed) {
+                        // Misión completada
+                        // Aplicar recompensas
+                        if (result.rewards) {
+                            player.xp = (player.xp || 0) + result.rewards.xp;
+                            player.salud = Math.min(100, player.salud + result.rewards.health);
+
+                            Object.entries(result.rewards.items || {}).forEach(([item, qty]) => {
+                                player.inventario[item] = (player.inventario[item] || 0) + qty;
+                            });
+
+                            // Guardar progreso en DB
+                            if (player.dbId) {
+                                survivalDB.guardarProgreso(player.dbId, {
+                                    nivel: player.nivel,
+                                    xp: player.xp,
+                                    xp_siguiente_nivel: player.xpParaSiguienteNivel,
+                                    salud: player.salud,
+                                    hambre: player.hambre,
+                                    locacion: player.locacion,
+                                    inventario: player.inventario,
+                                    skills: player.skills
+                                });
+                            }
+                        }
+
+                        ws.send(JSON.stringify({
+                            type: 'narrative:completed',
+                            rewards: result.rewards,
+                            summary: result.summary
+                        }));
+                    } else {
+                        // Continuar a siguiente paso
+                        ws.send(JSON.stringify({
+                            type: 'narrative:nextStep',
+                            step: result.nextStep,
+                            effects: result.effects
+                        }));
+                    }
+                } else {
+                    ws.send(JSON.stringify({ type: 'error', error: result.message }));
+                }
+            } catch (error) {
+                console.error('Error en elección narrativa:', error);
+                ws.send(JSON.stringify({ type: 'error', error: 'Error procesando elección' }));
+            }
+            return;
+        }
+
+        // VOTAR EN MISIÓN GRUPAL
+        if (msg.type === 'narrativeVote') {
+            try {
+                const narrativeMissions = await import('./systems/narrativeMissions.js');
+                const { missionId, choiceId } = msg;
+
+                const result = narrativeMissions.default.vote(missionId, player.id, choiceId);
+
+                if (result.success) {
+                    ws.send(JSON.stringify({
+                        type: 'narrative:voted',
+                        votesCount: result.votesCount,
+                        totalMembers: result.totalMembers
+                    }));
+                } else {
+                    ws.send(JSON.stringify({ type: 'error', error: result.message }));
+                }
+            } catch (error) {
+                console.error('Error votando:', error);
+                ws.send(JSON.stringify({ type: 'error', error: 'Error al votar' }));
+            }
+            return;
+        }
+
+        // OBTENER MISIÓN ACTIVA
+        if (msg.type === 'getActiveMission') {
+            try {
+                const narrativeMissions = await import('./systems/narrativeMissions.js');
+                const activeMission = narrativeMissions.default.getActiveMission(player.id);
+
+                ws.send(JSON.stringify({
+                    type: 'narrative:active',
+                    mission: activeMission
+                }));
+            } catch (error) {
+                console.error('Error obteniendo misión activa:', error);
+                ws.send(JSON.stringify({ type: 'error', error: 'Error' }));
+            }
+            return;
+        }
+
+        // ===== FIN MISIONES NARRATIVAS =====
 
         // COMERCIAR con Jorge
         if (msg.type === 'trade') {
@@ -3074,6 +3406,7 @@ wss.on('connection', (ws) => {
                 npcId: npc.id,
                 npc: npc.nombre,
                 text: npc.dialogo,
+                playSound: 'npc_saludo',
                 npcState: { salud: npc.salud, hambre: npc.hambre, moral: npc.moral },
                 options: opciones
             }));
@@ -3155,11 +3488,15 @@ wss.on('connection', (ws) => {
                     break;
             }
 
+            // Determinar qué sonido reproducir
+            const playSound = opcion.efecto === 'despedida' ? 'npc_despedida' : 'npc_charla';
+
             ws.send(JSON.stringify({
                 type: 'dialogue',
                 npcId: npc.id,
                 npc: npc.nombre,
                 text: respuesta,
+                playSound: playSound,
                 npcState: { salud: npc.salud, hambre: npc.hambre, moral: npc.moral },
                 options: opcion.efecto === 'despedida' ? [] : opciones
             }));
@@ -3484,19 +3821,46 @@ setInterval(() => {
 }, 60000); // Cada 60 segundos
 
 // ====================================
+// INICIALIZAR SISTEMA DE MUNDO VIVO
+// ====================================
+
+// Iniciar simulación del mundo (async para usar dynamic import)
+(async function initializeWorldSimulation() {
+    try {
+        const worldSimulation = await import('./world/simulation.js');
+        const narrativeEngine = await import('./world/narrativeEngine.js');
+        const npcRelationships = await import('./world/npcRelations.js');
+
+        // Inicializar tablas de mundo vivo
+        npcRelationships.default.initializeSchema();
+
+        // Iniciar simulación
+        worldSimulation.default.start();
+
+        console.log('🌍 Sistema de Mundo Vivo INICIADO');
+        console.log('📖 Motor de narrativa emergente activo');
+        console.log('💕 Sistema de relaciones entre NPCs activo');
+    } catch (error) {
+        console.error('❌ Error inicializando Mundo Vivo:', error);
+    }
+})();
+
+// ====================================
 // INICIAR
 // ====================================
 
 server.listen(PORT, () => {
     console.log(`
-🧟 SURVIVAL ZOMBIE MVP
+🧟 SURVIVAL ZOMBIE MVP - MUNDO VIVO
 ═══════════════════════════════════
 🌐 http://localhost:${PORT}
 🔌 WebSocket activo
-⏰ Simulación cada 10 segundos
+⏰ Simulación cada 30 segundos
+🎬 Narrativa emergente activa
+💕 Relaciones NPCs activas
 ═══════════════════════════════════
 `);
     console.log('📍 Locaciones:', Object.keys(WORLD.locations).length);
     console.log('👥 NPCs:', Object.keys(WORLD.npcs).length);
-    console.log('\n✨ Servidor listo. ¡Sobrevive!\n');
+    console.log('\n✨ Servidor listo. ¡Sobrevive y observa el mundo vivir!\n');
 });

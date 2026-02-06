@@ -1,11 +1,20 @@
-import db from '../db/index.js';
-import eventManager from './events.js';
-import enemyManager from './enemies.js';
+// Importar db desde survivalDB (que ya está inicializado)
+import survivalDB from '../db/survivalDB.js';
+const db = survivalDB.db;
+
+import events from './events.js';
+import enemies from './enemies.js';
+import narrativeEngine from './narrativeEngine.js';
+import npcRelationships from './npcRelations.js';
+import dynamicQuests from './dynamicQuests.js';
+import npcAI from './npcAI.js';
 
 /**
- * SISTEMA DE SIMULACIÓN AUTÓNOMA - Estilo Dwarf Fortress
+ * SISTEMA DE SIMULACIÓN AUTÓNOMA - Estilo Dwarf Fortress + Red Dead Redemption
  * El mundo vive por sí solo: NPCs toman decisiones, se mueven, interactúan,
  * recursos fluyen, eventos emergen, historias se crean proceduralmente.
+ * 
+ * NUEVO: Sistema de narrativa emergente con relaciones complejas entre NPCs
  */
 
 class WorldSimulation {
@@ -18,6 +27,7 @@ class WorldSimulation {
         this.config = {
             npcDecisionChance: 0.5, // 50% chance de decisión autónoma por tick (aumentado)
             eventSpawnChance: 0.25, // 25% chance de evento emergente (aumentado)
+            narrativeEventChance: 0.7, // 70% chance de evento narrativo entre NPCs (NUEVO)
             resourceDepletionRate: 0.02, // 2% depleción de recursos por tick
             relationshipChangeRate: 0.1, // Cambios graduales en relaciones
             npcNeedsDecayRate: 0.05 // Decaimiento de necesidades
@@ -28,7 +38,8 @@ class WorldSimulation {
             tick: 0,
             activeStories: [], // Narrativas emergentes
             factions: new Map(), // Grupos y alianzas
-            resourceFlows: new Map() // Flujo de recursos entre ubicaciones
+            resourceFlows: new Map(), // Flujo de recursos entre ubicaciones
+            recentNpcActions: [] // Acciones autónomas recientes de NPCs (IA)
         };
     }
 
@@ -58,13 +69,13 @@ class WorldSimulation {
     }
 
     // ===== TICK PRINCIPAL DEL MUNDO =====
-    worldTick() {
+    async worldTick() {
         this.worldState.tick++;
-        console.log(`\n🔄 Tick #${this.worldState.tick} - Simulando mundo...`);
+        // Mundo vive en silencio - jugador descubre cambios
 
         try {
-            // 1. NPCs autónomos toman decisiones
-            this.simulateNPCBehavior();
+            // 1. NPCs autónomos toman decisiones (IA MEJORADA)
+            await this.makeNpcDecisions();
 
             // 2. Simular necesidades de NPCs
             this.updateNPCNeeds();
@@ -75,6 +86,9 @@ class WorldSimulation {
             // 4. Interacciones entre NPCs
             this.simulateNPCInteractions();
 
+            // 4.5 NUEVO: Eventos narrativos entre NPCs (DRAMA!)
+            this.generateNarrativeEvents();
+
             // 5. Recursos y economía
             this.simulateResources();
 
@@ -84,10 +98,16 @@ class WorldSimulation {
             // 7. Evolución de relaciones
             this.updateRelationships();
 
+            // 7.5 NUEVO: Decaimiento natural de relaciones NPC-NPC
+            npcRelationships.decayAllRelationships();
+
             // 8. Actualizar facciones y alianzas
             this.updateFactions();
 
-            console.log(`✅ Tick #${this.worldState.tick} completado`);
+            // 9. NUEVO: Generar quests dinámicas basadas en eventos
+            this.generateDynamicQuests();
+
+            // Tick completado en silencio
         } catch (error) {
             console.error('❌ Error en tick de simulación:', error);
         }
@@ -258,15 +278,13 @@ class WorldSimulation {
                         db.prepare('UPDATE npcs SET lugar_actual = ? WHERE id = ?')
                             .run(newLocation, npc.id);
                         movementsCount++;
-                        console.log(`  🚶 ${npc.id} se movió a ${newLocation}`);
+                        // NPC se movió en silencio
                     }
                 }
             }
         });
 
-        if (movementsCount > 0) {
-            console.log(`  🚶 ${movementsCount} NPCs se movieron autónomamente`);
-        }
+        // NPCs se mueven sin anunciar
     }
 
     chooseNewLocation(currentLocation) {
@@ -307,9 +325,7 @@ class WorldSimulation {
             }
         });
 
-        if (interactionsCount > 0) {
-            console.log(`  💬 ${interactionsCount} interacciones entre NPCs`);
-        }
+        // Interacciones ocurren en background
     }
 
     generateNPCInteraction(npc1Id, npc2Id, location) {
@@ -368,7 +384,28 @@ class WorldSimulation {
         });
     }
 
-    // ===== EVENTOS EMERGENTES =====
+    // ===== GENERAR EVENTOS NARRATIVOS (NUEVO) =====
+    generateNarrativeEvents() {
+        // Chance de generar 1-3 eventos narrativos por tick
+        const eventCount = Math.random() < this.config.narrativeEventChance
+            ? Math.floor(Math.random() * 3) + 1
+            : 0;
+
+        let generatedCount = 0;
+
+        for (let i = 0; i < eventCount; i++) {
+            const event = narrativeEngine.generateWorldEvent();
+            if (event) {
+                narrativeEngine.logWorldEvent(event);
+                generatedCount++;
+                // Eventos narrativos ocurren en silencio - jugador debe descubrirlos
+            }
+        }
+
+        // Eventos generados en background (sin logs)
+    }
+
+    // ===== GENERAR EVENTOS EMERGENTES (ACTUALIZADO) =====
     generateEmergentEvents() {
         if (Math.random() > this.config.eventSpawnChance) return;
 
@@ -498,6 +535,29 @@ class WorldSimulation {
         // En futuro: grupos dinámicos que se forman/disuelven
     }
 
+    // ===== GENERAR QUESTS DINÁMICAS (NUEVO) =====
+    generateDynamicQuests() {
+        const quest = dynamicQuests.autoGenerateQuests();
+        if (quest) {
+            console.log(`  🎯 [QUEST] ${quest.title}`);
+        }
+    }
+    // ===== DECISIONES AUTÓNOMAS DE NPCs (IA MEJORADA) =====
+    async makeNpcDecisions() {
+        try {
+            const decisions = await npcAI.makeAllDecisions();
+            if (decisions.length > 0) {
+                console.log(`🤖 ${decisions.length} NPCs tomaron decisiones autónomas`);
+
+                // Guardar las acciones más recientes para exponer en estado
+                this.worldState.recentNpcActions = decisions.slice(-10);
+            }
+            return decisions;
+        } catch (error) {
+            console.error('Error en decisiones de NPCs:', error);
+            return [];
+        }
+    }
     // ===== LOGGING DE NARRATIVA =====
     logNPCAction(npc, action) {
         // Guardar para generar narrativas emergentes
@@ -514,14 +574,26 @@ class WorldSimulation {
         }
     }
 
-    // ===== OBTENER ESTADO DEL MUNDO =====
+    // ===== OBTENER ESTADO DEL MUNDO (MEJORADO) =====
     getWorldState() {
         return {
             tick: this.worldState.tick,
             isRunning: this.isRunning,
             activeStories: this.worldState.activeStories.slice(-10), // Últimas 10
             npcCount: db.prepare('SELECT COUNT(*) as count FROM npcs WHERE estado = ?').get('activo').count,
-            activeEvents: db.prepare('SELECT COUNT(*) as count FROM events WHERE estado = ?').get('activo').count
+            activeEvents: db.prepare('SELECT COUNT(*) as count FROM events WHERE estado = ?').get('activo').count,
+
+            // NUEVO: Estadísticas narrativas
+            narrativeStats: narrativeEngine.getWorldStats(),
+            recentWorldEvents: narrativeEngine.getRecentEvents(20),
+            intenseRelationships: npcRelationships.getIntenseRelationships(6),
+
+            // NUEVO: Misiones dinámicas
+            activeQuests: dynamicQuests.getActiveQuests(),
+
+            // NUEVO: Acciones autónomas de NPCs (IA)
+            recentNpcActions: this.worldState.recentNpcActions || [],
+            aiStats: npcAI.getAIStats()
         };
     }
 }

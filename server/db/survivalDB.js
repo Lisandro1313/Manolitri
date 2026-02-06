@@ -15,6 +15,18 @@ const schemaPath = path.join(__dirname, 'survival_schema.sql');
 const schema = fs.readFileSync(schemaPath, 'utf8');
 db.exec(schema);
 
+// Cargar expansión de mundo vivo (NPCs + Locaciones + Relaciones)
+const expansionPath = path.join(__dirname, 'expansion_mundo_vivo.sql');
+if (fs.existsSync(expansionPath)) {
+    try {
+        const expansion = fs.readFileSync(expansionPath, 'utf8');
+        db.exec(expansion);
+        console.log('✅ Expansión de Mundo Vivo cargada');
+    } catch (err) {
+        console.error('❌ Error cargando expansión:', err.message);
+    }
+}
+
 console.log('✅ Base de datos inicializada');
 
 // ===== USUARIOS =====
