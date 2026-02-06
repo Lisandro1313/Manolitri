@@ -507,31 +507,39 @@ class WorldSimulation {
 
     // ===== EVOLUCIÓN DE RELACIONES =====
     updateRelationships() {
-        // Relaciones gradualmente tienden a la media (60) si no hay interacción
-        const relationships = db.prepare('SELECT * FROM relationships').all();
+        try {
+            // Relaciones gradualmente tienden a la media (60) si no hay interacción
+            const relationships = db.prepare('SELECT * FROM relationships').all();
 
-        relationships.forEach(rel => {
-            const valores = JSON.parse(rel.valores);
-            let changed = false;
+            relationships.forEach(rel => {
+                const valores = JSON.parse(rel.valores);
+                let changed = false;
 
-            Object.keys(valores).forEach(key => {
-                const current = valores[key];
-                const target = 60; // Neutral
+                Object.keys(valores).forEach(key => {
+                    const current = valores[key];
+                    const target = 60; // Neutral
 
-                if (current < target) {
-                    valores[key] = Math.min(target, current + 1);
-                    changed = true;
-                } else if (current > target) {
-                    valores[key] = Math.max(target, current - 1);
-                    changed = true;
-                }
-            });
+                    if (current < target) {
+                        valores[key] = Math.min(target, current + 1);
+                        changed = true;
+                    } else if (current > target) {
+                        valores[key] = Math.max(target, current - 1);
+                        changed = true;
+                    }
+                });
 
-            if (changed) {
+                if (changed) {
                 db.prepare('UPDATE relationships SET valores = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
                     .run(JSON.stringify(valores), rel.id);
             }
         });
+        } catch (error) {
+            // Tabla relationships no existe o error en la query
+            // Esto es normal en las primeras ejecuciones antes de que la DB esté completamente inicializada
+            if (error.code !== 'SQLITE_ERROR') {
+                console.error('Error actualizando relaciones:', error);
+            }
+        }
     }
 
     // ===== FACCIONES Y ALIANZAS =====
