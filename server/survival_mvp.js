@@ -2253,6 +2253,13 @@ wss.on('connection', (ws) => {
                         nivel: WORLD.players[pid].nivel
                     }));
 
+                // Enviar lista al jugador que se conecta
+                ws.send(JSON.stringify({
+                    type: 'players:list',
+                    players: connectedPlayers
+                }));
+
+                // También enviar a todos los demás
                 broadcast({
                     type: 'players:list',
                     players: connectedPlayers
@@ -2899,7 +2906,13 @@ wss.on('connection', (ws) => {
         if (msg.type === 'getWorldState') {
             try {
                 const worldSimulation = await import('./world/simulation.js');
-                const state = worldSimulation.default.getWorldState();
+                const state = worldSimulation.default.getWorldStats() || {
+                    tick: 0,
+                    npcCount: 0,
+                    activeEvents: 0,
+                    narrativeStats: { romances: 0, conflictos: 0, dramas: 0, actividades: 0 },
+                    aiStats: { npcsWithMemories: 0, totalMemories: 0, activeGoals: 0 }
+                };
 
                 ws.send(JSON.stringify({
                     type: 'world:fullState',
@@ -2907,9 +2920,16 @@ wss.on('connection', (ws) => {
                 }));
             } catch (error) {
                 console.error('Error obteniendo estado del mundo:', error);
+                // Enviar estado vacío en lugar de error
                 ws.send(JSON.stringify({
-                    type: 'error',
-                    error: 'No se pudo obtener el estado del mundo'
+                    type: 'world:fullState',
+                    state: {
+                        tick: 0,
+                        npcCount: 0,
+                        activeEvents: 0,
+                        narrativeStats: { romances: 0, conflictos: 0, dramas: 0, actividades: 0 },
+                        aiStats: { npcsWithMemories: 0, totalMemories: 0, activeGoals: 0 }
+                    }
                 }));
             }
             return;
@@ -2921,7 +2941,7 @@ wss.on('connection', (ws) => {
         if (msg.type === 'getActiveQuests') {
             try {
                 const dynamicQuests = await import('./world/dynamicQuests.js');
-                const quests = dynamicQuests.default.getActiveQuests();
+                const quests = dynamicQuests.default.getActiveQuests() || [];
 
                 ws.send(JSON.stringify({
                     type: 'quests:list',
@@ -2929,9 +2949,10 @@ wss.on('connection', (ws) => {
                 }));
             } catch (error) {
                 console.error('Error obteniendo misiones:', error);
+                // Devolver array vacío en lugar de error
                 ws.send(JSON.stringify({
-                    type: 'error',
-                    error: 'No se pudieron obtener las misiones'
+                    type: 'quests:list',
+                    quests: []
                 }));
             }
             return;
