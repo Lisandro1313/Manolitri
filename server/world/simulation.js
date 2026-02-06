@@ -529,10 +529,10 @@ class WorldSimulation {
                 });
 
                 if (changed) {
-                db.prepare('UPDATE relationships SET valores = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
-                    .run(JSON.stringify(valores), rel.id);
-            }
-        });
+                    db.prepare('UPDATE relationships SET valores = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+                        .run(JSON.stringify(valores), rel.id);
+                }
+            });
         } catch (error) {
             // Tabla relationships no existe o error en la query
             // Esto es normal en las primeras ejecuciones antes de que la DB esté completamente inicializada

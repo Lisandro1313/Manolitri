@@ -55,19 +55,19 @@ async function initialize() {
     console.log('📦 Inicializando base de datos...');
 
     try {
-        // Cargar schema principal
-        const schemaPath = path.join(__dirname, 'schema_v2.sql');
+        // Cargar schema principal (con todas las tablas para mundo vivo)
+        const schemaPath = path.join(__dirname, 'schema.sql');
         const schema = fs.readFileSync(schemaPath, 'utf-8');
         db.exec(schema);
-        console.log('✓ Schema cargado');
+        console.log('✓ Schema cargado (locations, npcs, relationships, world_events)');
 
-        // Cargar datos adicionales
-        const dataPath = path.join(__dirname, 'data.sql');
-        if (fs.existsSync(dataPath)) {
-            const data = fs.readFileSync(dataPath, 'utf-8');
-            db.exec(data);
-            console.log('✓ Datos adicionales cargados');
-        }
+        // schema.sql ya incluye datos iniciales, no necesitamos data.sql
+        // const dataPath = path.join(__dirname, 'data.sql');
+        // if (fs.existsSync(dataPath)) {
+        //     const data = fs.readFileSync(dataPath, 'utf-8');
+        //     db.exec(data);
+        //     console.log('✓ Datos adicionales cargados');
+        // }
 
         // Cargar expansión de mundo vivo (NPCs + Locaciones + Relaciones)
         const expansionPath = path.join(__dirname, 'expansion_mundo_vivo.sql');
