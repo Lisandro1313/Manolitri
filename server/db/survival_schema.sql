@@ -165,3 +165,23 @@ CREATE TABLE IF NOT EXISTS dynamic_quests (
 
 CREATE INDEX IF NOT EXISTS idx_dynamic_quests_status ON dynamic_quests(status);
 CREATE INDEX IF NOT EXISTS idx_dynamic_quests_expires ON dynamic_quests(expires_at);
+
+-- Tabla de eventos del mundo (para sistema de simulación)
+CREATE TABLE IF NOT EXISTS events (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL, -- 'narrative', 'combat', 'resource', 'disaster', etc.
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    location_id TEXT,
+    npcs_involved TEXT DEFAULT '[]', -- JSON array
+    players_affected TEXT DEFAULT '[]', -- JSON array
+    severity INTEGER DEFAULT 1, -- 1-10
+    created_at INTEGER NOT NULL,
+    resolved_at INTEGER,
+    status TEXT DEFAULT 'active', -- active, resolved, expired
+    consequences TEXT DEFAULT '{}' -- JSON object
+);
+
+CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
+CREATE INDEX IF NOT EXISTS idx_events_location ON events(location_id);
+CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at);

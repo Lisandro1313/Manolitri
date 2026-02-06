@@ -2,6 +2,7 @@
   "name": "survival-zombie",
   "version": "2.0.0",
   "description": "Survival Zombie - Multiplayer RPG con mundo vivo, NPCs, crafting y quests cooperativas",
+  "type": "module",
   "main": "server/survival_mvp.js",
   "scripts": {
     "start": "node server/survival_mvp.js",

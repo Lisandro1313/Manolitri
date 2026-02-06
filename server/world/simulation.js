@@ -426,25 +426,30 @@ class WorldSimulation {
     createEmergentEvent(type, location) {
         const eventData = this.generateEventData(type, location);
 
-        // Crear evento en la base de datos
-        const result = db.prepare(`
-            INSERT INTO events (tipo, lugar, titulo, descripcion, opciones, estado, participantes)
-            VALUES (?, ?, ?, ?, ?, 'activo', '[]')
-        `).run(
-            eventData.tipo,
-            location,
-            eventData.titulo,
-            eventData.descripcion,
-            JSON.stringify(eventData.opciones)
-        );
+        // Crear evento en la base de datos (tabla events debe existir)
+        try {
+            const result = db.prepare(`
+                INSERT INTO events (id, type, title, description, location_id, created_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'active')
+            `).run(
+                `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                eventData.tipo,
+                eventData.titulo,
+                eventData.descripcion,
+                location,
+                Date.now()
+            );
 
-        console.log(`  ⚡ Evento emergente: "${eventData.titulo}" en ${location}`);
+            console.log(`  ⚡ Evento emergente: "${eventData.titulo}" en ${location}`);
 
-        // Si es horda, spawnear enemigos
-        if (type === 'horda_zombies') {
-            for (let i = 0; i < 3; i++) {
-                enemyManager.spawnEnemy(location);
+            // Si es horda, spawnear enemigos
+            if (type === 'horda_zombies') {
+                for (let i = 0; i < 3; i++) {
+                    enemyManager.spawnEnemy(location);
+                }
             }
+        } catch (err) {
+            console.error('  ⚠️ Error creando evento emergente:', err.message);
         }
     }
 

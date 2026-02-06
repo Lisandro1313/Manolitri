@@ -205,6 +205,11 @@ class NPCRelationshipSystem {
         }));
     }
 
+    // ===== ALIAS PARA COMPATIBILIDAD CON NPCAI =====
+    getRelationshipsByNpc(npcId) {
+        return this.getNPCRelationships(npcId);
+    }
+
     // ===== OBTENER RELACIONES INTENSAS =====
     getIntenseRelationships(minIntensity = 5) {
         return db.prepare(`
