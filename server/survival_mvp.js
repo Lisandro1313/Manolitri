@@ -84,7 +84,48 @@ const WORLD = {
             recursos: { armas: 8, medicinas: 3, comida: 2, materiales: 12 },
             zombies: 8,
             nivelRuido: 0,
-            conectado_a: ['refugio']
+            conectado_a: ['refugio', 'puente_sur']
+        },
+        puente_sur: {
+            id: 'puente_sur',
+            nombre: 'Puente Sur',
+            tipo: 'dangerous',
+            descripcion: 'Un puente largo que conecta con otro sector de la ciudad. Peligroso.',
+            recursos: { comida: 3, materiales: 5 },
+            zombies: 15,
+            nivelRuido: 0,
+            conectado_a: ['comisaria', 'refugio_norte']
+        },
+        refugio_norte: {
+            id: 'refugio_norte',
+            nombre: 'Refugio Norte',
+            tipo: 'safe',
+            descripcion: 'Otro grupo de sobrevivientes. Más organizados pero menos amigables.',
+            recursos: { comida: 30, medicinas: 8, armas: 5, materiales: 15 },
+            zombies: 0,
+            nivelRuido: 0,
+            defensas: 60,
+            conectado_a: ['puente_sur', 'fabrica', 'mercado']
+        },
+        fabrica: {
+            id: 'fabrica',
+            nombre: 'Fábrica Abandonada',
+            tipo: 'loot',
+            descripcion: 'Una fábrica de procesamiento. Muchos recursos pero también peligros.',
+            recursos: { materiales: 30, armas: 3, comida: 2 },
+            zombies: 10,
+            nivelRuido: 0,
+            conectado_a: ['refugio_norte']
+        },
+        mercado: {
+            id: 'mercado',
+            nombre: 'Mercado Negro',
+            tipo: 'trade',
+            descripcion: 'Un mercado ilegal donde se intercambian recursos. Cuidado con los tramposos.',
+            recursos: { comida: 20, medicinas: 5, armas: 10, materiales: 8 },
+            zombies: 2,
+            nivelRuido: 0,
+            conectado_a: ['refugio_norte']
         }
     },
 
@@ -183,6 +224,70 @@ const WORLD = {
                 'El trueque es el nuevo dinero.',
                 '¿Han oído de la zona militar? Hay armas ahí.'
             ]
+        },
+        // === REFUGIO NORTE - NUEVOS NPCs ===
+        comandante_steel: {
+            id: 'comandante_steel',
+            nombre: 'Comandante Steel',
+            rol: 'lider',
+            locacion: 'refugio_norte',
+            salud: 100,
+            hambre: 90,
+            moral: 85,
+            vivo: true,
+            estado: 'activo',
+            enMision: false,
+            dialogo: 'Aquí las cosas se hacen a mi manera.',
+            dialogos: [
+                'Orden y disciplina. Eso es lo que necesitamos.',
+                'No confío en extraños fácilmente.',
+                'Si quieres pertenecer aquí, demuéstralo.',
+                'He visto demasiada traición.',
+                '¿Qué información traes?'
+            ],
+            misionesDisponibles: ['espiar_refugio_central', 'informar_movimientos']
+        },
+        ana_tech: {
+            id: 'ana_tech',
+            nombre: 'Ana la Técnica',
+            rol: 'ingeniera',
+            locacion: 'refugio_norte',
+            salud: 85,
+            hambre: 70,
+            moral: 60,
+            vivo: true,
+            estado: 'activo',
+            enMision: false,
+            dialogo: 'Puedo hackear casi cualquier cosa.',
+            dialogos: [
+                'Las radios viejas aún funcionan si sabes cómo.',
+                'He interceptado comunicaciones extrañas.',
+                'Alguien está espiando nuestras transmisiones.',
+                '¿Puedes conseguirme componentes electrónicos?',
+                'No confíes en el Comandante, tiene secretos.'
+            ],
+            misionesDisponibles: ['conseguir_componentes', 'investigar_radios']
+        },
+        marco_sombra: {
+            id: 'marco_sombra',
+            nombre: 'Marco "Sombra"',
+            rol: 'infiltrador',
+            locacion: 'mercado',
+            salud: 90,
+            hambre: 75,
+            moral: 50,
+            vivo: true,
+            estado: 'activo',
+            enMision: false,
+            dialogo: 'Veo y escucho todo. Tengo información.',
+            dialogos: [
+                'Los secretos tienen precio.',
+                'Sé quién es leal y quién no.',
+                'El Comandante planea algo grande.',
+                'Jorge el Comerciante no es quien dice ser.',
+                '¿Quieres saber la verdad? Trae algo valioso.'
+            ],
+            misionesDisponibles: ['espiar_comerciante', 'revelar_secretos', 'seguir_npc']
         }
     },
 
@@ -715,14 +820,16 @@ setInterval(() => {
             npc.moral = Math.max(0, npc.moral - 3);
         }
 
-        // Muerte por inanición o heridas
+        // NPCs no mueren, solo quedan muy debilitados
         if (npc.salud <= 0) {
-            npc.vivo = false;
-            console.log(`💀 ${npc.nombre} ha muerto`);
-            broadcast({ type: 'npc:died', npcId: npc.id, nombre: npc.nombre });
+            // npc.vivo = false;
+            npc.salud = 5; // Quedan con 5 HP mínimo
+            npc.moral = Math.max(0, npc.moral - 10);
+            console.log(`⚠️ ${npc.nombre} está gravemente herido`);
+            broadcast({ type: 'npc:injured', npcId: npc.id, nombre: npc.nombre });
             broadcast({
                 type: 'world:event',
-                message: `💀 ${npc.nombre} ha fallecido`,
+                message: `⚠️ ${npc.nombre} está gravemente herido`,
                 category: 'death'
             });
 
@@ -1085,12 +1192,13 @@ function aplicarConsecuenciasQuest(questNombre, decision) {
             refugio.recursos.materiales = Math.floor(refugio.recursos.materiales / 2);
             broadcast({ type: 'world:update', message: '🏃 Evacuaron todos. Perdieron recursos pero están a salvo' });
         } else {
-            // Solo los fuertes = algunos NPCs mueren
+            // Solo los fuertes = algunos NPCs quedan heridos
             const npcsDebiles = Object.values(WORLD.npcs).filter(n => n.vivo && n.salud < 50);
             if (npcsDebiles.length > 0) {
                 const victima = npcsDebiles[0];
-                victima.vivo = false;
-                broadcast({ type: 'world:update', message: `💀 ${victima.nombre} no sobrevivió la evacuación selectiva` });
+                // victima.vivo = false;
+                victima.salud = Math.max(10, victima.salud - 30);
+                broadcast({ type: 'world:update', message: `⚠️ ${victima.nombre} resultó gravemente herido en la evacuación` });
             }
         }
     }
@@ -1110,17 +1218,17 @@ function executeHorde() {
     refugio.defensas = Math.max(0, refugio.defensas - danioDefensas);
     console.log(`🛡️ Defensas reducidas: ${danioDefensas} (Nuevas: ${refugio.defensas})`);
 
-    // NPCs pueden morir
+    // NPCs pueden quedar heridos pero no mueren
     const npcsVivos = Object.values(WORLD.npcs).filter(n => n.vivo);
     if (danio > 10 && npcsVivos.length > 0 && Math.random() > 0.5) {
         const victima = npcsVivos[Math.floor(Math.random() * npcsVivos.length)];
-        victima.vivo = false;
-        victima.salud = 0;
+        // victima.vivo = false;
+        victima.salud = Math.max(10, victima.salud - 40);
         broadcast({
-            type: 'horde:npc_killed',
+            type: 'horde:npc_injured',
             npcNombre: victima.nombre
         });
-        console.log(`💀 ${victima.nombre} murió en la horda`);
+        console.log(`⚠️ ${victima.nombre} fue gravemente herido en la horda`);
     }
 
     // Daño a jugadores en refugio
