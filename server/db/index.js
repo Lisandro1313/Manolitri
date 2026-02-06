@@ -1,11 +1,15 @@
 /**
- * Database Module - CommonJS version con Promises
+ * Database Module - ES Module version con Promises
  * Usa better-sqlite3 con wrappers async para compatibilidad
  */
 
-const Database = require('better-sqlite3');
-const fs = require('fs');
-const path = require('path');
+import Database from 'better-sqlite3';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, '../../manolitri_v2.db');
 const db = new Database(dbPath);
@@ -81,7 +85,5 @@ async function initialize() {
     }
 }
 
-module.exports = {
-    ...dbAsync,
-    initialize
-};
+export default dbAsync;
+export { initialize };
