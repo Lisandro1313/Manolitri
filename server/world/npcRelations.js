@@ -79,9 +79,20 @@ class NPCRelationshipSystem {
             rel = this.getRelationship(id1, id2);
         }
 
+        // Parsear historia de forma segura
+        let historia = [];
+        if (rel.historia && rel.historia.trim()) {
+            try {
+                historia = JSON.parse(rel.historia);
+            } catch (e) {
+                console.error('Error parseando historia de relación:', e.message);
+                historia = [];
+            }
+        }
+
         return {
             ...rel,
-            historia: JSON.parse(rel.historia || '[]')
+            historia
         };
     }
 

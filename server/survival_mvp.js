@@ -3235,7 +3235,7 @@ wss.on('connection', (ws) => {
         if (msg.type === 'getWorldState') {
             try {
                 const worldSimulation = await import('./world/simulation.js');
-                const state = worldSimulation.default.getWorldStats() || {
+                const state = worldSimulation.default.getWorldState() || {
                     tick: 0,
                     npcCount: 0,
                     activeEvents: 0,
