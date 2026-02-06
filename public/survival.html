@@ -1367,6 +1367,9 @@
     let renderCache = {}; // Caché de renders para evitar actualizaciones innecesarias
     let tabsLoaded = { game: true }; // Tabs ya cargados (game se carga al inicio)
     let connections = new Map(); // Simulación de conexiones para contar jugadores
+    let worldEvents = []; // Caché de eventos del mundo
+    let intenseRelationships = []; // Caché de relaciones intensas
+    let worldStats = null; // Caché de estadísticas del mundo
 
     // Helper para hash simple de objetos
     function simpleHash(obj) {
@@ -1886,6 +1889,8 @@
       } else if (tabName === 'mundo') {
         // Siempre refrescar datos del mundo al abrir
         refreshWorldEvents();
+        loadIntenseRelationships();
+        loadWorldStats();
       }
     }
 
@@ -2035,10 +2040,22 @@
     }
 
     function renderWorldEvents(events) {
+      // Si no se pasan eventos, usar la caché
+      if (!events && worldEvents.length > 0) {
+        events = worldEvents;
+      }
+      
       const feed = document.getElementById('worldEventsFeed');
-      if (!feed || !events || events.length === 0) {
+      if (!feed) return;
+      
+      if (!events || events.length === 0) {
         feed.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">No hay eventos recientes...</p>';
         return;
+      }
+      
+      // Actualizar caché si se recibieron eventos nuevos
+      if (events && events.length > 0) {
+        worldEvents = events;
       }
 
       // Agrupar eventos por tipo para mejor visualización
@@ -2090,12 +2107,22 @@
     }
 
     function renderIntenseRelationships(relationships) {
+      // Si no se pasan relaciones, usar la caché
+      if (!relationships && intenseRelationships.length > 0) {
+        relationships = intenseRelationships;
+      }
+      
       const container = document.getElementById('intenseRelationships');
       if (!container) return;
 
       if (!relationships || relationships.length === 0) {
         container.innerHTML = '<p style="color: #888;">Sin relaciones dramáticas...</p>';
         return;
+      }
+      
+      // Actualizar caché
+      if (relationships && relationships.length > 0) {
+        intenseRelationships = relationships;
       }
 
       let html = '';
@@ -2125,8 +2152,21 @@
     }
 
     function renderWorldStats(stats) {
+      // Si no se pasan stats, usar la caché
+      if (!stats && worldStats) {
+        stats = worldStats;
+      }
+      
       const container = document.getElementById('worldStats');
-      if (!container || !stats) return;
+      if (!container) return;
+      
+      if (!stats) {
+        container.innerHTML = '<p style="color: #888;">Cargando...</p>';
+        return;
+      }
+      
+      // Actualizar caché
+      worldStats = stats;
 
       const narrativeStats = stats.narrativeStats || {};
       const aiStats = stats.aiStats || {};
@@ -2962,6 +3002,9 @@
         
         // Solicitar estado completo del mundo
         ws.send(JSON.stringify({ type: 'getWorld' }));
+        
+        // Solicitar lista de jugadores online
+        ws.send(JSON.stringify({ type: 'getPlayers' }));
         
         // Actualizar indicador de conexión
         const statusEl = document.getElementById('connectionStatus');
@@ -3799,6 +3842,20 @@
       // Mantener solo últimos 30 mensajes
       while (chatLog.children.length > 30) {
         chatLog.removeChild(chatLog.firstChild);
+      }
+    }
+
+    function renderChat() {
+      // Esta función se llama al cambiar a la pestaña social
+      // El chat se renderiza dinámicamente con addChatMessage cuando llegan mensajes
+      // Aquí solo aseguramos que el scroll esté al final
+      const chatLog = document.getElementById('chatLog');
+      if (chatLog) {
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+      const dmLog = document.getElementById('dmLog');
+      if (dmLog) {
+        dmLog.scrollTop = dmLog.scrollHeight;
       }
     }
 
