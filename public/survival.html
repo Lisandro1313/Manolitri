@@ -1677,9 +1677,8 @@
           oscillator.type = 'sine';
           gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.08);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.08);
           return;
         case 'craft':
           // Sonido de martillo
@@ -1687,9 +1686,8 @@
           oscillator.type = 'square';
           gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.05);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.05);
           return;
         case 'move':
           // Sonido sutil de paso
@@ -1697,9 +1695,8 @@
           oscillator.type = 'sine';
           gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.06);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.06);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.06);
           return;
         case 'notification':
           // Ping suave
@@ -1707,9 +1704,8 @@
           oscillator.type = 'sine';
           gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.12);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.12);
           return;
         case 'death':
           // Sonido grave de muerte
@@ -1718,9 +1714,8 @@
           oscillator.type = 'sawtooth';
           gainNode.gain.setValueAtTime(0.18, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.4);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.4);
           return;
         case 'achievement':
           // Fanfarria corta
@@ -1730,9 +1725,8 @@
           oscillator.type = 'sine';
           gainNode.gain.setValueAtTime(0.12, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.25);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.25);
           return;
         case 'click':
           // Click UI
@@ -1740,16 +1734,13 @@
           oscillator.type = 'sine';
           gainNode.gain.setValueAtTime(0.06, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
-          try {
-            oscillator.stop(audioContext.currentTime + 0.03);
-          } catch(e) { /* oscillator ya detenido */ }
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.03);
           return;
       }
       
       oscillator.start(audioContext.currentTime);
-      try {
-        oscillator.stop(audioContext.currentTime + 0.2);
-      } catch(e) { /* oscillator ya detenido */ }
+      oscillator.stop(audioContext.currentTime + 0.2);
     }
     
     // ====================================
