@@ -1619,6 +1619,63 @@ function useSpecialAbility(player, abilityId, ws) {
 // API REST - AUTH Y PERSONAJES
 // ====================================
 
+// Crear jugador directo (para compatibility con survival.html)
+app.post('/api/player/create', (req, res) => {
+    const { nombre } = req.body;
+    
+    if (!nombre || nombre.length < 3) {
+        return res.json({ success: false, error: 'Nombre muy corto (mínimo 3 caracteres)' });
+    }
+    
+    // Generar ID único para el jugador
+    const playerId = `player_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Crear jugador en memoria
+    WORLD.players[playerId] = {
+        id: playerId,
+        nombre: nombre,
+        salud: 100,
+        hambre: 50,
+        locacion: 'refugio',
+        inventario: {
+            comida: 5,
+            medicinas: 2,
+            armas: 1,
+            materiales: 3
+        },
+        stats: {
+            zombiesKilled: 0,
+            itemsFound: 0,
+            daysSurvived: 0,
+            missionsCompleted: 0,
+            travels: 0
+        },
+        nivel: 1,
+        xp: 0,
+        xpParaSiguienteNivel: 100,
+        skills: {
+            combate: 0,
+            supervivencia: 0,
+            sigilo: 0,
+            medicina: 0
+        },
+        clase: 'Superviviente',
+        cooldowns: {
+            scavenge: 0,
+            attack: 0,
+            rest: 0,
+            trade: 0
+        }
+    };
+    
+    console.log(`✅ Jugador creado: ${nombre} (${playerId})`);
+    
+    res.json({ 
+        success: true, 
+        player: WORLD.players[playerId]
+    });
+});
+
 // Registro
 app.post('/api/auth/register', (req, res) => {
     const { username, password } = req.body;
@@ -2438,9 +2495,58 @@ wss.on('connection', (ws) => {
             playerId = msg.playerId;
             connections.set(playerId, ws);
 
+            // Verificar si el jugador existe en memoria
+            if (!WORLD.players[playerId]) {
+                console.log(`⚠️ Jugador ${playerId} no existe en memoria. Creando jugador temporal...`);
+                
+                // Crear jugador con datos básicos
+                WORLD.players[playerId] = {
+                    id: playerId,
+                    nombre: playerId.split('_')[1] || 'Desconocido',
+                    salud: 100,
+                    hambre: 50,
+                    locacion: 'refugio',
+                    inventario: {
+                        comida: 5,
+                        medicinas: 2,
+                        armas: 1,
+                        materiales: 3
+                    },
+                    stats: {
+                        zombiesKilled: 0,
+                        itemsFound: 0,
+                        daysSurvived: 0,
+                        missionsCompleted: 0,
+                        travels: 0
+                    },
+                    nivel: 1,
+                    xp: 0,
+                    xpParaSiguienteNivel: 100,
+                    skills: {
+                        combate: 0,
+                        supervivencia: 0,
+                        sigilo: 0,
+                        medicina: 0
+                    },
+                    clase: 'Superviviente',
+                    cooldowns: {
+                        scavenge: 0,
+                        attack: 0,
+                        rest: 0,
+                        trade: 0
+                    }
+                };
+            }
+
             ws.send(JSON.stringify({
                 type: 'world:state',
                 world: WORLD
+            }));
+
+            // Enviar información del jugador específico
+            ws.send(JSON.stringify({
+                type: 'player:data',
+                player: WORLD.players[playerId]
             }));
 
             // Verificar que el jugador existe en WORLD.players

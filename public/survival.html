@@ -745,6 +745,8 @@
       <input type="text" id="playerName" placeholder="Ingresa tu nombre de superviviente" maxlength="20" style="margin: 20px 0;">
       <button onclick="createPlayer()" style="width: 100%; padding: 15px; font-size: 18px; background: #006600; border: 2px solid #00ff00; color: #00ff00; cursor: pointer; font-weight: bold;">🚪 ENTRAR AL APOCALIPSIS</button>
       
+      <button onclick="resetPlayerData()" style="width: 100%; padding: 8px; margin-top: 10px; font-size: 12px; background: #440000; border: 1px solid #660000; color: #ff6666; cursor: pointer;">🔄 Limpiar datos y crear nueva cuenta</button>
+      
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
         <p style="font-size: 11px; color: #666; margin-bottom: 10px;">¿Te gusta el proyecto?</p>
         <a href="https://link.mercadopago.com.ar/donaciondelproyecto" target="_blank" style="display: inline-block; padding: 8px 15px; background: #009ee3; color: white; text-decoration: none; border-radius: 3px; font-size: 12px; font-weight: bold;">💝 APOYAR CON UNA DONACIÓN</a>
@@ -1443,6 +1445,7 @@
     let totalPlayTime = 0; // Tiempo total jugado en milisegundos
     let attackCooldown = 0; // Timestamp cuando se puede atacar nuevamente
     let cooldownInterval = null; // Intervalo para actualizar UI de cooldown
+    let messageQueue = []; // Cola de mensajes cuando está desconectado
 
     // Helper para hash simple de objetos
     function simpleHash(obj) {
@@ -1539,6 +1542,49 @@
         
         while (logDiv2.children.length > 50) {
           logDiv2.removeChild(logDiv2.firstChild);
+        }
+      }
+    }
+    
+    // Función auxiliar para enviar mensajes de forma segura
+    function safeSend(data, options = {}) {
+      const { queueIfDisconnected = true, showWarning = true } = options;
+      
+      // Si el WebSocket está conectado, enviar inmediatamente
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+        return true;
+      }
+      
+      // Si está desconectado y se permite encolar
+      if (queueIfDisconnected) {
+        messageQueue.push(data);
+        if (showWarning) {
+          log('Mensaje encolado. Se enviará al reconectar...', 'warning');
+        }
+        return false;
+      }
+      
+      // No se pudo enviar y no se permite encolar
+      if (showWarning) {
+        log('No conectado al servidor', 'warning');
+      }
+      return false;
+    }
+    
+    // Procesar cola de mensajes pendientes
+    function processMessageQueue() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      
+      while (messageQueue.length > 0) {
+        const data = messageQueue.shift();
+        try {
+          ws.send(JSON.stringify(data));
+          console.log('Mensaje de cola enviado:', data.type);
+        } catch (error) {
+          console.error('Error enviando mensaje de cola:', error);
+          messageQueue.unshift(data); // Volver a poner en la cola
+          break;
         }
       }
     }
@@ -2761,6 +2807,11 @@
         }
       }
 
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No conectado al servidor', 'warning');
+        return;
+      }
+
       ws.send(JSON.stringify({
         type: 'startNarrativeMission',
         templateId,
@@ -2800,7 +2851,12 @@
     // Mostrar paso narrativo
     function showNarrativeStep(step) {
       if (!step) {
-        console.error('showNarrativeStep: step is null or undefined');
+        console.warn('showNarrativeStep: step is null or undefined. Misión puede haber finalizado.');
+        // Ocultar sección narrativa si no hay paso
+        const narrativeSection = document.getElementById('narrativeMissionPanel');
+        if (narrativeSection) {
+          narrativeSection.style.display = 'none';
+        }
         return;
       }
 
@@ -2886,6 +2942,12 @@
       if (narrativeTimer) {
         clearInterval(narrativeTimer);
         narrativeTimer = null;
+      }
+
+      // Validar conexión
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No conectado al servidor', 'warning');
+        return;
       }
 
       // Enviar elección
@@ -3056,7 +3118,7 @@
       const nombre = document.getElementById('playerName').value.trim();
       
       if (!nombre || nombre.length < 3) {
-        alert('Nombre muy corto');
+        alert('Nombre muy corto (mínimo 3 caracteres)');
         return;
       }
       
@@ -3068,6 +3130,11 @@
       
       if (data.success) {
         player = data.player;
+        
+        // ✅ GUARDAR playerId en localStorage para persistencia
+        localStorage.setItem('playerId', player.id);
+        console.log('✅ Jugador guardado:', player.id);
+        
         document.getElementById('login').style.display = 'none';
         document.getElementById('gameScreen').style.display = 'block';
         
@@ -3079,7 +3146,22 @@
         }, 1000);
         
         connectWebSocket();
+      } else {
+        alert(data.error || 'Error al crear jugador');
       }
+    }
+    
+    function resetPlayerData() {
+      if (!confirm('⚠️ Esto eliminará tu cuenta actual y tendrás que crear una nueva. ¿Continuar?')) {
+        return;
+      }
+      
+      // Limpiar localStorage
+      localStorage.removeItem('playerId');
+      console.log('🗑️ Datos del jugador eliminados');
+      
+      // Recargar página
+      window.location.reload();
     }
 
     function connectWebSocket() {
@@ -3107,6 +3189,15 @@
         
         // Solicitar lista de jugadores online
         ws.send(JSON.stringify({ type: 'getPlayers' }));
+        
+        // Solicitar misiones narrativas en curso (por si fue una reconexión)
+        ws.send(JSON.stringify({ type: 'getNarrativeMissions' }));
+        
+        // Procesar cola de mensajes pendientes
+        if (messageQueue.length > 0) {
+          log(`📤 Enviando ${messageQueue.length} mensajes pendientes...`, 'info');
+          setTimeout(() => processMessageQueue(), 500);
+        }
         
         // Actualizar indicador de conexión
         const statusEl = document.getElementById('connectionStatus');
@@ -3168,6 +3259,15 @@
     // WEBSOCKET HANDLERS (Organizado por tipo)
     // ====================================
     const messageHandlers = {
+      'player:data': (msg) => {
+        // Recibir datos actualizados del jugador desde el servidor
+        if (msg.player) {
+          player = msg.player;
+          console.log('✅ Datos del jugador actualizados:', player.nombre);
+          renderGame();
+        }
+      },
+      
       'world:state': (msg) => {
         world = msg.world;
         console.log('📦 Mundo recibido:', world);
@@ -3432,9 +3532,13 @@
           }
         }
         
-        // Mostrar siguiente paso
+        // Mostrar siguiente paso (solo si hay paso)
         setTimeout(() => {
-          showNarrativeStep(msg.step);
+          if (msg.step) {
+            showNarrativeStep(msg.step);
+          } else {
+            console.log('No hay paso siguiente, probablemente misión completada');
+          }
         }, 500);
       },
       
@@ -4743,6 +4847,10 @@
     }
 
     function craft(item) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('No conectado al servidor', 'warning');
+        return;
+      }
       ws.send(JSON.stringify({ type: 'craft', item }));
     }
 
@@ -4761,6 +4869,10 @@
       else if (tipo === 'stealth') confirmMsg = '¿Intento sigiloso? Puede fallar y te lastimarán.';
       
       if (confirm(confirmMsg)) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          log('No conectado al servidor', 'warning');
+          return;
+        }
         ws.send(JSON.stringify({ type: 'attack', attackType: tipo }));
         // Establecer cooldown (4s para shoot/melee, 2s para stealth)
         attackCooldown = now + (tipo === 'stealth' ? 2000 : 4000);
@@ -4794,10 +4906,6 @@
         const originalText = btn.textContent.split('⏳')[0].trim();
         btn.textContent = `${originalText} ⏳${segundos}s`;
       });
-    }
-    
-    function craft(item) {
-      ws.send(JSON.stringify({ type: 'craft', item }));
     }
 
     function renderLocations() {
